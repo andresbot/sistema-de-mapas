@@ -171,7 +171,7 @@ MIT License - siéntete libre de usar este código para aprender
 
 ## 👨‍💻 Autor
 
-**Tu Nombre** - [@tu_usuario](https://github.com/tu_usuario)
+**Tu Nombre** - [@Andres Botero](https://github.com/andresbot)
 
 ---
 
