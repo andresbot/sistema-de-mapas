@@ -10,7 +10,7 @@ Aplicación web full-stack para descubrir y compartir lugares con reseñas, cate
 
 ## 📖 Descripción
 
-Proyecto de aprendizaje para construir una aplicación completa de mapas con reseñas, similar a Google Maps/Yelp. Los usuarios pueden:
+Proyecto de aprendizaje para construir una aplicación completa de mapas con reseñas. Los usuarios pueden:
 
 - 🗺️ Explorar lugares en un mapa interactivo
 - 📍 Ver restaurantes, sitios turísticos, cafeterías, etc.
@@ -144,35 +144,3 @@ Ver [ARCHITECTURE.md](ARCHITECTURE.md) para detalles completos.
 - [ ] Deploy a producción
 
 ---
-
-## 🤝 Contribuir
-
-Este es un proyecto de aprendizaje. Pull requests son bienvenidos!
-
----
-
-## 📚 Aprendizaje
-
-Este proyecto está diseñado para aprender:
-- Desarrollo full-stack con JavaScript
-- Arquitectura cliente-servidor
-- APIs RESTful
-- Integración de mapas
-- Manejo de bases de datos NoSQL
-- Autenticación y seguridad
-
----
-
-## 📄 Licencia
-
-MIT License - siéntete libre de usar este código para aprender
-
----
-
-## 👨‍💻 Autor
-
-**Tu Nombre** - [@Andres Botero](https://github.com/andresbot)
-
----
-
-**¡Happy coding!** 🚀
