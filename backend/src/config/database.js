@@ -4,9 +4,9 @@ export const connectDB = async () => {
   try {
     await prisma.$connect();
     await prisma.$queryRaw`SELECT 1`;
-    console.log('✅ MySQL connected with Prisma');
+    console.log('MySQL connected with Prisma');
   } catch (error) {
-    console.error(`❌ MySQL connection error: ${error.message}`);
+    console.error(`MySQL connection error: ${error.message}`);
     throw error;
   }
 };

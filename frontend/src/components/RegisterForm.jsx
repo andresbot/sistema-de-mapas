@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export const RegisterForm = ({ onAuthSuccess }) => {
   const [isLogin, setIsLogin] = useState(true); // Por defecto mostramos Login
-  const [formData, setFormData] = useState({ username: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ nombre: '', email: '', password: '' });
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleSubmit = async (e) => {
@@ -11,10 +11,15 @@ export const RegisterForm = ({ onAuthSuccess }) => {
     setErrorMsg('');
     const endpoint = isLogin ? '/api/login' : '/api/register';
     try {
-      const res = await axios.post(`http://localhost:3000${endpoint}`, formData);
+      const payload = isLogin ? { email: formData.email, password: formData.password } : formData;
+      const res = await axios.post(`http://localhost:5000${endpoint}`, payload);
+      if (res.data.token) {
+        localStorage.setItem('auth_token', res.data.token);
+        localStorage.setItem('auth_user', JSON.stringify(res.data.user));
+      }
       onAuthSuccess(res.data.user); // Pasa los datos del usuario a App.jsx
     } catch (err) {
-      setErrorMsg(err.response?.data?.message || "Error de conexión");
+      setErrorMsg(err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || "Error de conexión");
     }
   };
 
@@ -23,7 +28,7 @@ export const RegisterForm = ({ onAuthSuccess }) => {
       <h2 style={{ textAlign: 'center', color: '#1d4ed8' }}>{isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}</h2>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
         {!isLogin && (
-          <input placeholder="Nombre de usuario" onChange={e => setFormData({...formData, username: e.target.value})} required style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ddd' }} />
+          <input placeholder="Nombre de usuario" value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} required style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ddd' }} />
         )}
         <input type="email" placeholder="Email" onChange={e => setFormData({...formData, email: e.target.value})} required style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ddd' }} />
         <input type="password" placeholder="Contraseña" onChange={e => setFormData({...formData, password: e.target.value})} required style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ddd' }} />
