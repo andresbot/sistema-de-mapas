@@ -6,11 +6,20 @@ import BottomNav from './components/BottomNav';
 import { RegisterForm } from './components/RegisterForm';
 import './App.css';
 
+// Configurar interceptor de axios para enviar el JWT
+axios.interceptors.request.use(config => {
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 function App() {
   // --- ESTADOS PRINCIPALES ---
   const [lugares, setLugares] = useState([]);
-  const [view, setView] = useState('mapa'); 
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [view, setView] = useState('mapa');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const [categoriaSel, setCategoriaSel] = useState('Todos');
   const [busqueda, setBusqueda] = useState("");
@@ -27,6 +36,14 @@ function App() {
 
   // --- CARGA DE DATOS Y GPS ---
   useEffect(() => {
+    // Restaurar sesión si existe
+    const savedToken = localStorage.getItem('auth_token');
+    const savedUser = localStorage.getItem('auth_user');
+    if (savedToken && savedUser) {
+      setIsLoggedIn(true);
+      setUserData(JSON.parse(savedUser));
+    }
+
     fetchLugares();
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -39,7 +56,7 @@ function App() {
 
   const fetchLugares = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/api/lugares');
+      const res = await axios.get('http://localhost:5000/api/lugares');
       setLugares(res.data);
     } catch (err) { console.error("❌ Error cargando datos:", err); }
   };
@@ -86,7 +103,7 @@ function App() {
     if (window.confirm("¿Estás seguro de eliminar este lugar?")) {
       try {
         await axios.delete(`http://localhost:3000/api/lugares/${id}`);
-        fetchLugares(); 
+        fetchLugares();
       } catch (err) {
         alert("Error al eliminar");
       }
@@ -97,17 +114,17 @@ function App() {
     <div className="app-container">
       {/* Navbar solo en mapa */}
       {view === 'mapa' && (
-        <Navbar 
-          onFilter={setCategoriaSel} 
-          onSearch={setBusqueda} 
+        <Navbar
+          onFilter={setCategoriaSel}
+          onSearch={setBusqueda}
           categoriaActiva={categoriaSel}
         />
       )}
 
       <main className="main-content">
         {view === 'mapa' ? (
-          <MapView 
-            lugares={lugaresFiltrados} 
+          <MapView
+            lugares={lugaresFiltrados}
             userLocation={userLocation}
             onMapClick={handleMapClick}
             onDelete={handleDelete}
@@ -117,11 +134,11 @@ function App() {
           <div className="perfil-section" style={{ padding: '20px', display: 'flex', justifyContent: 'center' }}>
             {isLoggedIn ? (
               <div className="user-card" style={{ textAlign: 'center' }}>
-                <div style={{fontSize: '50px'}}>👤</div>
+                <div style={{ fontSize: '50px' }}>👤</div>
                 <h2>Hola, {userData?.username || 'Explorador'}</h2>
                 <p>Bienvenido a Zarzal Explorer</p>
-                <button 
-                  onClick={() => setIsLoggedIn(false)} 
+                <button
+                  onClick={() => setIsLoggedIn(false)}
                   className="btn-logout"
                   style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer', borderRadius: '8px', border: '1px solid red', color: 'red', background: 'none' }}
                 >
@@ -142,16 +159,16 @@ function App() {
             <h3>📍 Nuevo punto en Zarzal</h3>
             <form onSubmit={guardarLugar}>
               <label>Nombre:</label>
-              <input 
-                type="text" 
-                required 
+              <input
+                type="text"
+                required
                 value={nuevoLugar.nombre}
-                onChange={(e) => setNuevoLugar({...nuevoLugar, nombre: e.target.value})}
+                onChange={(e) => setNuevoLugar({ ...nuevoLugar, nombre: e.target.value })}
               />
               <label>Categoría:</label>
-              <select 
+              <select
                 value={nuevoLugar.categoria}
-                onChange={(e) => setNuevoLugar({...nuevoLugar, categoria: e.target.value})}
+                onChange={(e) => setNuevoLugar({ ...nuevoLugar, categoria: e.target.value })}
               >
                 <option value="Restaurante">🍴 Restaurante</option>
                 <option value="Parque">🌳 Parque</option>
