@@ -1,13 +1,12 @@
-import mongoose from 'mongoose';
+import { prisma } from './prisma.js';
 
-const connectDB = async () => {
+export const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`✅ MongoDB connected: ${conn.connection.host}`);
+    await prisma.$connect();
+    await prisma.$queryRaw`SELECT 1`;
+    console.log('✅ MySQL connected with Prisma');
   } catch (error) {
-    console.error(`❌ MongoDB connection error: ${error.message}`);
-    process.exit(1);
+    console.error(`❌ MySQL connection error: ${error.message}`);
+    throw error;
   }
 };
-
-export default connectDB;

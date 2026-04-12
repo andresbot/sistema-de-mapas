@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -51,7 +51,7 @@ model Lugar {
   telefono           String?
   horario            String?
   sitioWeb           String?
-  imagenes           String[]
+  imagenes           Json?
   puntuacionPromedio Float    @default(0)
   totalResenas       Int      @default(0)
   createdAt          DateTime @default(now())
@@ -71,7 +71,7 @@ model Resena {
   id          String    @id @default(cuid())
   puntuacion  Int
   comentario  String?
-  imagenes    String[]
+  imagenes    Json?
   fechaVisita DateTime?
   meGusta     Int       @default(0)
   createdAt   DateTime  @default(now())
