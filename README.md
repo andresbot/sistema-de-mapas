@@ -60,20 +60,20 @@ cd mapas
 ### 2. Instalar dependencias del frontend
 
 ```bash
-cd client
+cd frontend
 npm install
 ```
 
 ### 3. Instalar dependencias del backend
 
 ```bash
-cd ../server
+cd ../backend
 npm install
 ```
 
 ### 4. Configurar variables de entorno
 
-Crea un archivo `.env` en la carpeta `server`:
+Crea un archivo `.env` en la carpeta `backend`:
 
 ```env
 PORT=5000
@@ -90,14 +90,14 @@ NODE_ENV=development
 
 **Terminal 1 - Backend:**
 ```bash
-cd server
+cd backend
 npm run dev
 ```
 El servidor correrá en `http://localhost:5000`
 
 **Terminal 2 - Frontend:**
 ```bash
-cd client
+cd frontend
 npm run dev
 ```
 La app estará en `http://localhost:5173`
@@ -108,7 +108,7 @@ La app estará en `http://localhost:5173`
 
 ```
 mapas/
-├── client/          # Frontend React
+├── frontend/          # Frontend React
 │   ├── src/
 │   │   ├── components/
 │   │   ├── pages/
@@ -116,7 +116,7 @@ mapas/
 │   │   └── services/
 │   └── package.json
 │
-├── server/          # Backend Node.js
+├── backend/          # Backend Node.js
 │   ├── src/
 │   │   ├── models/
 │   │   ├── routes/
@@ -124,7 +124,7 @@ mapas/
 │   │   └── middleware/
 │   └── package.json
 │
-└── ARCHITECTURE.md  # Documentación de arquitectura
+└── ARCHITECTURE.md   # Documentación de arquitectura
 ```
 
 Ver [ARCHITECTURE.md](ARCHITECTURE.md) para detalles completos.
@@ -134,9 +134,9 @@ Ver [ARCHITECTURE.md](ARCHITECTURE.md) para detalles completos.
 ## 🎯 Roadmap
 
 - [x] Configuración inicial del proyecto
+- [x] Arquitectura frontend + backend
 - [ ] Mapa interactivo básico
 - [ ] Sistema de categorías
-- [ ] Backend con Express y MongoDB
 - [ ] Autenticación de usuarios
 - [ ] CRUD de lugares
 - [ ] Sistema de reseñas
