@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Rol {
+  user
+  admin
+}
+
+model Usuario {
+  id        String   @id @default(cuid())
+  nombre    String
+  email     String   @unique
+  password  String
+  avatar    String?
+  rol       Rol      @default(user)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lugares Lugar[]
+  resenas Resena[]
+
+  @@map("usuarios")
+}
+
+model Categoria {
+  id          String  @id @default(cuid())
+  nombre      String
+  slug        String  @unique
+  icono       String
+  color       String
+  descripcion String?
+
+  lugares Lugar[]
+
+  @@map("categorias")
+}
+
+model Lugar {
+  id                 String   @id @default(cuid())
+  nombre             String
+  descripcion        String?
+  latitud            Float
+  longitud           Float
+  direccion          String?
+  telefono           String?
+  horario            String?
+  sitioWeb           String?
+  imagenes           String[]
+  puntuacionPromedio Float    @default(0)
+  totalResenas       Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  categoriaId String
+  creadorId   String
+
+  categoria Categoria @relation(fields: [categoriaId], references: [id])
+  creador   Usuario   @relation(fields: [creadorId], references: [id])
+  resenas   Resena[]
+
+  @@map("lugares")
+}
+
+model Resena {
+  id          String    @id @default(cuid())
+  puntuacion  Int
+  comentario  String?
+  imagenes    String[]
+  fechaVisita DateTime?
+  meGusta     Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  lugarId   String
+  usuarioId String
+
+  lugar   Lugar   @relation(fields: [lugarId], references: [id])
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+
+  @@unique([lugarId, usuarioId])
+  @@map("resenas")
+}
