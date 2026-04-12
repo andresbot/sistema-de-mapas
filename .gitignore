@@ -52,3 +52,5 @@ coverage/
 # Varios
 .vercel
 .netlify
+
+/.qwen
