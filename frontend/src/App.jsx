@@ -4,23 +4,22 @@ import MapView from './components/MapContainer';
 import Navbar from './components/Navbar';
 import BottomNav from './components/BottomNav';
 import { RegisterForm } from './components/RegisterForm';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import './App.css';
 
 // Configurar interceptor de axios para enviar el JWT
 axios.interceptors.request.use(config => {
-  const token = localStorage.getItem('auth_token');
+  const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-function App() {
-  // --- ESTADOS PRINCIPALES ---
+function AppContent() {
+  const { user, loading, logout, isAuthenticated } = useAuth();
   const [lugares, setLugares] = useState([]);
   const [view, setView] = useState('mapa');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState(null);
   const [categoriaSel, setCategoriaSel] = useState('Todos');
   const [busqueda, setBusqueda] = useState("");
   const [userLocation, setUserLocation] = useState(null);
@@ -36,14 +35,6 @@ function App() {
 
   // --- CARGA DE DATOS Y GPS ---
   useEffect(() => {
-    // Restaurar sesión si existe
-    const savedToken = localStorage.getItem('auth_token');
-    const savedUser = localStorage.getItem('auth_user');
-    if (savedToken && savedUser) {
-      setIsLoggedIn(true);
-      setUserData(JSON.parse(savedUser));
-    }
-
     fetchLugares();
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -54,6 +45,10 @@ function App() {
     }
   }, []);
 
+  if (loading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Cargando...</div>;
+  }
+
   const fetchLugares = async () => {
     try {
       const res = await axios.get('http://localhost:5000/api/lugares');
@@ -62,9 +57,7 @@ function App() {
   };
 
   // --- FUNCIÓN DE REDIRECCIÓN (AUTH) ---
-  const handleAuthSuccess = (user) => {
-    setUserData(user);
-    setIsLoggedIn(true);
+  const handleAuthSuccess = () => {
     setView('mapa'); // Te manda al mapa inmediatamente
   };
 
@@ -132,13 +125,13 @@ function App() {
           />
         ) : (
           <div className="perfil-section" style={{ padding: '20px', display: 'flex', justifyContent: 'center' }}>
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               <div className="user-card" style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '50px' }}>👤</div>
-                <h2>Hola, {userData?.username || 'Explorador'}</h2>
+                <h2>Hola, {user?.nombre || 'Explorador'}</h2>
                 <p>Bienvenido a Zarzal Explorer</p>
                 <button
-                  onClick={() => setIsLoggedIn(false)}
+                  onClick={logout}
                   className="btn-logout"
                   style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer', borderRadius: '8px', border: '1px solid red', color: 'red', background: 'none' }}
                 >
@@ -191,4 +184,10 @@ function App() {
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}

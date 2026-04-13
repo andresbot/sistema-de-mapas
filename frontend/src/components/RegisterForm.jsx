@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 export const RegisterForm = ({ onAuthSuccess }) => {
+  const { login, register } = useAuth();
   const [isLogin, setIsLogin] = useState(true); // Por defecto mostramos Login
   const [formData, setFormData] = useState({ nombre: '', email: '', password: '' });
   const [errorMsg, setErrorMsg] = useState('');
@@ -9,15 +10,20 @@ export const RegisterForm = ({ onAuthSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
-    const endpoint = isLogin ? '/api/login' : '/api/register';
+
     try {
-      const payload = isLogin ? { email: formData.email, password: formData.password } : formData;
-      const res = await axios.post(`http://localhost:5000${endpoint}`, payload);
-      if (res.data.token) {
-        localStorage.setItem('auth_token', res.data.token);
-        localStorage.setItem('auth_user', JSON.stringify(res.data.user));
+      const payload = isLogin
+        ? { email: formData.email, password: formData.password }
+        : formData;
+
+      const response = isLogin ? await login(payload) : await register(payload);
+
+      if (!response.success) {
+        setErrorMsg(response.message || 'Error de autenticación');
+        return;
       }
-      onAuthSuccess(res.data.user); // Pasa los datos del usuario a App.jsx
+
+      onAuthSuccess?.(response.data.user);
     } catch (err) {
       setErrorMsg(err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || "Error de conexión");
     }
