@@ -66,6 +66,22 @@
   display: none; /* Chrome/Safari */
 }
 
+.session-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.logout-visible-btn {
+  border: 1px solid #ef4444;
+  background: #ffffff;
+  color: #ef4444;
+  font-weight: 700;
+  border-radius: 14px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
 .pill {
   background: var(--white);
   border: none;

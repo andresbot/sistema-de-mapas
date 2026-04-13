@@ -33,6 +33,13 @@ function AppContent() {
     descripcion: ''
   });
 
+  const fetchLugares = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/lugares');
+      setLugares(res.data);
+    } catch (err) { console.error("❌ Error cargando datos:", err); }
+  };
+
   // --- CARGA DE DATOS Y GPS ---
   useEffect(() => {
     fetchLugares();
@@ -49,16 +56,15 @@ function AppContent() {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Cargando...</div>;
   }
 
-  const fetchLugares = async () => {
-    try {
-      const res = await axios.get('http://localhost:5000/api/lugares');
-      setLugares(res.data);
-    } catch (err) { console.error("❌ Error cargando datos:", err); }
-  };
-
   // --- FUNCIÓN DE REDIRECCIÓN (AUTH) ---
   const handleAuthSuccess = () => {
     setView('mapa'); // Te manda al mapa inmediatamente
+  };
+
+  const handleLogout = () => {
+    logout();
+    setView('perfil');
+    setShowModal(false);
   };
 
   // --- LÓGICA DE FILTRADO ---
@@ -111,6 +117,8 @@ function AppContent() {
           onFilter={setCategoriaSel}
           onSearch={setBusqueda}
           categoriaActiva={categoriaSel}
+          isAuthenticated={isAuthenticated}
+          onLogout={handleLogout}
         />
       )}
 
@@ -131,7 +139,7 @@ function AppContent() {
                 <h2>Hola, {user?.nombre || 'Explorador'}</h2>
                 <p>Bienvenido a Zarzal Explorer</p>
                 <button
-                  onClick={logout}
+                  onClick={handleLogout}
                   className="btn-logout"
                   style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer', borderRadius: '8px', border: '1px solid red', color: 'red', background: 'none' }}
                 >
