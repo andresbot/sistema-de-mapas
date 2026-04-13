@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Navbar = ({ onFilter, onSearch, categoriaActiva }) => {
+const Navbar = ({ onFilter, onSearch, categoriaActiva, isAuthenticated, onLogout }) => {
   const categorias = ['Todos', 'Restaurante', 'Parque', 'Cultura', 'Tienda'];
 
   return (
@@ -27,6 +27,14 @@ const Navbar = ({ onFilter, onSearch, categoriaActiva }) => {
           </button>
         ))}
       </div>
+
+      {isAuthenticated && (
+        <div className="session-actions">
+          <button className="logout-visible-btn" onClick={onLogout}>
+            Cerrar sesión
+          </button>
+        </div>
+      )}
     </header>
   );
 };
