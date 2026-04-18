@@ -284,7 +284,8 @@ Desarrollada con metodología ágil Scrum (5 sprints × 2 semanas), Mapify entre
 
 ### MVP (2026)
 
-- ✅ Funcionalidad: 23/23 HS completadas
+- ✅ Funcionalidad MVP: 23/23 HS MVP completadas (HS1-HS23)
+- ✅ Backlog total: 32 HS planificadas dentro de los 5 sprints del proyecto
 - ✅ Confiabilidad: 99%+ uptime en staging
 - ✅ Usabilidad: Score NPS ≥ 50
 - ✅ Documentación: 100% cobertura técnica y operativa

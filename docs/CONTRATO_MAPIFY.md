@@ -175,11 +175,13 @@ Los siguientes entregables constituyen el alcance acordado para cada sprint. Cua
 
 | Sprint | Periodo | Historias | Entregable / Criterio de aceptacion |
 |---|---|---|---|
-| Sprint 1 | 16-31 mar | HS1, HS2, HS3, HS4, HS21, HS22, HS23 | Base tecnica y autenticacion completas: registro, login, JWT, logout, arquitectura inicial y configuracion/modelado de BD con Prisma. |
-| Sprint 2 | 1-15 abr | HS5, HS6, HS7 | Mapa interactivo operativo con marcadores y navegacion funcional. |
-| Sprint 3 | 16-30 abr | HS8, HS9, HS10, HS11 | CRUD de lugares completo: ver detalle, crear, editar y eliminar. |
-| Sprint 4 | 1-15 may | HS12, HS13, HS14, HS15 | Modulo de resenas completo: ver, crear, calificar y eliminar. |
-| Sprint 5 | 16 may-8 jun | HS16, HS17, HS18, HS19, HS20 | Filtros + UX: filtro por categoria, busqueda por nombre, responsive, navegacion clara y feedback visual; cierre documental y validacion final. |
+| Sprint 1 | 16-31 mar | HS1, HS2, HS3, HS4, HS21, HS22, HS23, HS24 | Base tecnica y autenticacion completas: registro, login, JWT, logout, arquitectura inicial, configuracion/modelado de BD con Prisma y recuperacion de contrasena. |
+| Sprint 2 | 1-15 abr | HS5, HS6, HS7, HS28 | Mapa interactivo operativo con marcadores, navegacion funcional y comparticion por enlace de lugar. |
+| Sprint 3 | 16-30 abr | HS8, HS9, HS10, HS11, HS25, HS27 | CRUD de lugares completo, perfil publico de negocio y gestion de favoritos. |
+| Sprint 4 | 1-15 may | HS12, HS13, HS14, HS15, HS26, HS29 | Modulo de resenas completo con flujo de reporte y moderacion de contenido. |
+| Sprint 5 | 16 may-8 jun | HS16, HS17, HS18, HS19, HS20, HS30, HS31, HS32 | Filtros + UX con metricas de visibilidad, recomendaciones y notificaciones; cierre documental y validacion final. |
+
+**Nota de alcance contractual:** El presente contrato contempla un backlog integrado de historias HS1-HS32, distribuido dentro de los cinco sprints del plan de trabajo.
 
 ---
 

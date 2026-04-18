@@ -10,7 +10,7 @@
 | **Metodologia** | SCRUM - 5 sprints de 2 semanas |
 | **Fecha de inicio** | 16 de marzo de 2026 |
 | **Fecha de entrega final** | 8 de junio de 2026 |
-| **Version del documento** | v1.0 - marzo 2026 |
+| **Version del documento** | v1.1 - abril 2026 |
 
 > **Nota Scrum:** Este documento define intenciones y limites. El alcance es variable y flexible; el tiempo y el costo son fijos. Cualquier cambio de alcance debe ser acordado entre Product Owner y Scrum Master antes del Sprint Planning correspondiente.
 
@@ -59,6 +59,14 @@ Proporcionar una plataforma web que centralice el descubrimiento de lugares loca
 | **E4 - Resenas y reputacion** | Visualizacion, creacion, calificacion por estrellas y eliminacion de resenas. | Sprint 4 - Resenas | HS12, HS13, HS14, HS15 | Must have |
 | **E5 - Filtros + UX** | Filtro por categoria, busqueda por nombre y mejoras de experiencia de usuario (responsive, navegacion y feedback visual). | Sprint 5 - Filtros + UX | HS16, HS17, HS18, HS19, HS20 | Must have |
 
+### 3.1.1. Historias adicionales integradas en Sprint 1-5
+
+| Epica | Descripcion | Sprint de ejecucion | Historias incluidas | Prioridad |
+|---|---|---|---|---|
+| **E6 - Seguridad y cuentas** | Recuperacion de contrasena y gestion de acceso complementaria. | Sprint 1 | HS24 | Should have |
+| **E7 - Comunidad y moderacion** | Perfil publico de negocio, reportes, moderacion y comparticion. | Sprint 2-4 | HS25, HS26, HS28, HS29 | Should have |
+| **E8 - Engagement y crecimiento** | Favoritos, metricas, recomendaciones y notificaciones. | Sprint 3-5 | HS27, HS30, HS31, HS32 | Could/Should have |
+
 ### 3.2. MVP - Minimo Producto Viable
 
 El MVP incluye las historias minimas para operar el flujo de extremo a extremo: explorar, filtrar, evaluar y consultar.
@@ -84,17 +92,17 @@ El MVP incluye las historias minimas para operar el flujo de extremo a extremo: 
 
 | Sprint | Periodo | Epicas | Incremento entregable |
 |---|---|---|---|
-| **Sprint 1** | 16-31 mar 2026 | E1 | Registro y login (HS1-HS2), persistencia JWT (HS3), logout (HS4), arquitectura frontend/backend (HS21) y configuracion/modelado de BD con Prisma (HS22-HS23). |
-| **Sprint 2** | 1-15 abr 2026 | E2 | Mapa interactivo funcional (HS5), marcadores de lugares (HS6) y navegacion del mapa (HS7). |
-| **Sprint 3** | 16-30 abr 2026 | E3 | CRUD de lugares: detalle (HS8), crear (HS9), editar (HS10) y eliminar (HS11). |
-| **Sprint 4** | 1-15 may 2026 | E4 | Modulo de resenas: visualizar (HS12), crear (HS13), calificacion por estrellas (HS14) y eliminar (HS15). |
-| **Sprint 5** | 16 may-8 jun 2026 | E5 | Filtros y UX: filtrar por categoria (HS16), busqueda por nombre (HS17), responsive (HS18), navegacion clara (HS19) y feedback visual (HS20). |
+| **Sprint 1** | 16-31 mar 2026 | E1 + E6 | Registro/login (HS1-HS2), persistencia JWT (HS3), logout (HS4), arquitectura y BD (HS21-HS23), y recuperacion de contrasena (HS24). |
+| **Sprint 2** | 1-15 abr 2026 | E2 + E7 | Mapa interactivo (HS5), marcadores (HS6), navegacion del mapa (HS7) y compartir lugar por enlace (HS28). |
+| **Sprint 3** | 16-30 abr 2026 | E3 + E7 + E8 | CRUD de lugares (HS8-HS11), perfil publico de negocio (HS25) y favoritos (HS27). |
+| **Sprint 4** | 1-15 may 2026 | E4 + E7 | Modulo de resenas (HS12-HS15), reporte de resena inapropiada (HS26) y moderacion de contenido (HS29). |
+| **Sprint 5** | 16 may-8 jun 2026 | E5 + E8 | Filtros y UX (HS16-HS20), metricas de negocio (HS30), recomendaciones (HS31) y notificaciones (HS32). |
 
 ### 4.2. Entregables de Gestion - Documentacion Scrum
 
 | Artefacto Scrum | Descripcion | Frecuencia |
 |---|---|---|
-| Product Backlog actualizado | Listado priorizado de epicas e historias de usuario. | Antes de cada Sprint Planning |
+| Product Backlog actualizado | Listado priorizado de epicas e historias (HS). | Antes de cada Sprint Planning |
 | Sprint Backlog | Historias comprometidas y tareas del sprint vigente. | Al inicio de cada sprint |
 | Acta de Aceptacion | Aprobacion formal del incremento por parte del PO. | Al cierre de cada sprint |
 | Reporte Burn-down | Seguimiento de trabajo restante vs tiempo. | Actualizacion diaria |
@@ -127,12 +135,12 @@ Un incremento se considera terminado cuando cumple todos estos criterios:
 - [ ] El cambio esta versionado en Git con commits claros.
 - [ ] El tablero de trabajo refleja el estado real del avance.
 
-#### B - Nivel de Historia de Usuario
+#### B - Nivel de Historia (HS)
 - [ ] Se validaron todos los criterios de aceptacion de la historia.
 - [ ] La funcionalidad se comporta correctamente en movil y escritorio.
 - [ ] El incremento esta integrado sin romper funcionalidades existentes.
 - [ ] Se documenta cualquier decision tecnica relevante.
-- [ ] Product Owner aprueba la HU en Sprint Review.
+- [ ] Product Owner aprueba la historia (HS) en Sprint Review.
 
 #### C - Nivel de Sprint
 - [ ] Las historias comprometidas estan en estado Done o justificadas ante PO.
@@ -177,4 +185,4 @@ Cada incremento se acepta o rechaza al cierre de sprint con este flujo:
 
 ---
 
-Mapify S.A.S. - Documento vivo - v1.0 - marzo 2026 - Sujeto a revision en cada Sprint Planning.
+Mapify S.A.S. - Documento vivo - v1.1 - abril 2026 - Sujeto a revision en cada Sprint Planning.

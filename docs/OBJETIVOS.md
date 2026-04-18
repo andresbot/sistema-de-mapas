@@ -15,7 +15,7 @@ Desarrollar e implementar una plataforma web funcional que permita descubrir, re
 
 ## Contexto tecnico del producto
 
-Mapify se desarrolla como aplicacion web basada en React 19 + Vite en frontend, y Node.js + Express.js en backend, con persistencia en MySQL mediante Prisma ORM y autenticacion con JWT. El sistema organiza la entrega en cinco bloques funcionales: base de autenticacion y arquitectura tecnica, mapa interactivo, CRUD de lugares, modulo de reseñas y mejoras de filtros/UX. Esta estructura permite evolucion incremental del producto con trazabilidad directa desde el backlog (HS1-HS23).
+Mapify se desarrolla como aplicacion web basada en React 19 + Vite en frontend, y Node.js + Express.js en backend, con persistencia en MySQL mediante Prisma ORM y autenticacion con JWT. El sistema organiza la entrega en cinco sprints con alcance funcional integrado. Esta estructura permite evolucion incremental del producto con trazabilidad directa sobre el backlog HS1-HS32.
 
 La plataforma debe ofrecer una experiencia de uso clara: el usuario se autentica, explora lugares en el mapa, consulta detalles, interactua con resenas y filtra resultados por categoria o nombre desde una interfaz responsive.
 
@@ -91,6 +91,23 @@ Estas mejoras convierten un prototipo funcional en un MVP util y presentable par
 
 ---
 
+### Objetivo 5 - Integrar historias complementarias dentro del plan base
+
+Implementar las historias complementarias para fortalecer seguridad de cuentas, moderacion comunitaria y capacidades de crecimiento del producto (favoritos, metricas, recomendaciones y notificaciones), integrandolas en los cinco sprints existentes.
+
+**Como se mide?**
+Historias HS24-HS32 planificadas, desarrolladas y validadas dentro de Sprint 1-5 con trazabilidad completa y sin degradar funcionalidades base.
+
+**Por que importa?**
+Permite evolucionar Mapify desde un MVP funcional hacia una plataforma sostenible con mayor retencion de usuarios y valor para negocios locales.
+
+> **Conexion con historias:** HS24, HS25, HS26, HS27, HS28, HS29, HS30, HS31, HS32
+
+**Herramientas:** Node.js, Express.js, MySQL, Prisma ORM, React, GitHub Actions, panel de analitica.
+**Fecha limite:** 8 de junio de 2026.
+
+---
+
 ## Trazabilidad Objetivos - Sprints - Historias
 
 | Objetivo | Sprint | Historias relacionadas |
@@ -99,6 +116,7 @@ Estas mejoras convierten un prototipo funcional en un MVP util y presentable par
 | OE2 - Mapa interactivo | Sprint 2 | HS5, HS6, HS7 |
 | OE3 - Lugares y resenas | Sprint 3 y 4 | HS8, HS9, HS10, HS11, HS12, HS13, HS14, HS15 |
 | OE4 - Filtros, UX y validacion MVP | Sprint 5 | HS16, HS17, HS18, HS19, HS20 |
+| OE5 - Integracion de historias complementarias | Sprint 1 a 5 | HS24, HS25, HS26, HS27, HS28, HS29, HS30, HS31, HS32 |
 
 ---
 
@@ -106,11 +124,11 @@ Estas mejoras convierten un prototipo funcional en un MVP util y presentable par
 
 | Periodo | Actividad principal | Sprint |
 |---|---|---|
-| 16 mar - 31 mar | Base tecnica, autenticacion y base de datos | Sprint 1 |
-| 1 abr - 15 abr | Mapa interactivo y marcadores | Sprint 2 |
-| 16 abr - 30 abr | CRUD de lugares | Sprint 3 |
-| 1 may - 15 may | Modulo de resenas | Sprint 4 |
-| 16 may - 8 jun | Filtros, UX, validacion y cierre documental | Sprint 5 |
+| 16 mar - 31 mar | Base tecnica, autenticacion y recuperacion de contrasena | Sprint 1 |
+| 1 abr - 15 abr | Mapa, navegacion y comparticion | Sprint 2 |
+| 16 abr - 30 abr | CRUD de lugares, perfil publico y favoritos | Sprint 3 |
+| 1 may - 15 may | Resenas, reportes y moderacion | Sprint 4 |
+| 16 may - 8 jun | Filtros, UX, metricas, recomendaciones y notificaciones | Sprint 5 |
 
 ---
 
@@ -120,4 +138,4 @@ Mapify contribuye al fortalecimiento digital de negocios y lugares locales al ce
 
 ---
 
-Documento alineado con backlog HS1-HS23 · Metodologia Scrum por sprints · Entrega final: 8 de junio de 2026
+Documento alineado con backlog integrado HS1-HS32 · Metodologia Scrum por sprints · Entrega integrada en Sprint 1-5
