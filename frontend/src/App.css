@@ -352,3 +352,147 @@
   padding: 15px 0;
   border-top: 1px solid #f2f2f7;
 }
+
+/* =====================================================
+   MARCADORES PERSONALIZADOS DE CATEGORÍA (DivIcon)
+   ===================================================== */
+
+.custom-marker {
+  width: 40px;
+  height: 40px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-marker:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+.custom-marker-emoji {
+  transform: rotate(45deg);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.custom-marker-tip {
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 10px solid;
+  margin: -2px auto 0;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+}
+
+/* =====================================================
+   ESTILOS ADICIONALES PARA PlacePopup
+   ===================================================== */
+
+.popup-nombre {
+  margin: 10px 0 5px 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1c1c1e;
+  line-height: 1.2;
+}
+
+.popup-descripcion {
+  font-size: 13px;
+  color: #3a3a3c;
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
+
+.popup-details {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+  border-top: 1px solid #f2f2f7;
+  padding-top: 10px;
+}
+
+.popup-details li {
+  font-size: 12px;
+  color: #636366;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.detail-icon {
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+.popup-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.popup-stars {
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.popup-rating-text {
+  font-size: 11px;
+  color: #8e8e93;
+  font-weight: 600;
+}
+
+/* Fila de botones de acción del popup */
+.popup-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  border-top: 1px solid #f2f2f7;
+  padding-top: 12px;
+}
+
+.popup-actions .btn-resena-main {
+  flex: 1;
+  margin-bottom: 0;
+  opacity: 0.5;
+  cursor: not-allowed;
+  font-size: 13px;
+  padding: 10px 8px;
+}
+
+.btn-delete-place {
+  flex: 1;
+  background: #fff0f0;
+  border: 1px solid #ffcdd2;
+  color: var(--danger);
+  padding: 10px 8px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.btn-delete-place:hover {
+  background: #ffe5e5;
+  transform: scale(1.03);
+}
+
+.popup-sin-resenas {
+  font-size: 12px;
+  color: #aeaeb2;
+  font-style: italic;
+  margin-bottom: 0 !important;
+}

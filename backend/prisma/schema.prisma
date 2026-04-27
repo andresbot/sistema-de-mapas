@@ -52,6 +52,7 @@ model Lugar {
   horario            String?
   sitioWeb           String?
   imagenes           Json?
+  publicado          Boolean  @default(true)
   puntuacionPromedio Float    @default(0)
   totalResenas       Int      @default(0)
   createdAt          DateTime @default(now())
