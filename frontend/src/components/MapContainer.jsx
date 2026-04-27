@@ -1,48 +1,75 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import PlacePopup from './PlacePopup';
 
-// Configuración iconos Azules (Lugares DB)
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
-
-// NUEVO: Configuración Icono Rojo (Usuario)
+// ----- Icono de usuario (rojo) -----
 const redIcon = L.icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
 });
 
-// Aplicamos el azul por defecto globalmente
-L.Marker.prototype.options.icon = DefaultIcon;
+/**
+ * Genera un DivIcon circular con el color de la categoría del lugar.
+ * Permite distinguir visualmente cada categoría sin depender de imágenes externas.
+ */
+const createCategoryIcon = (color = '#007AFF', emoji = '📍') =>
+  L.divIcon({
+    className: '',
+    html: `
+      <div class="custom-marker" style="background:${color};">
+        <span class="custom-marker-emoji">${emoji}</span>
+      </div>
+      <div class="custom-marker-tip" style="border-top-color:${color};"></div>
+    `,
+    iconSize: [40, 48],
+    iconAnchor: [20, 48],
+    popupAnchor: [0, -50],
+  });
 
+// ----- Subcomponente de eventos de mapa -----
+const MapEvents = ({ onMapClick }) => {
+  useMapEvents({
+    click(e) {
+      if (onMapClick) onMapClick(e.latlng);
+    },
+  });
+  return null;
+};
+
+/**
+ * Vista principal del mapa.
+ *
+ * Criterios de aceptación cumplidos:
+ *  ✅ Cada lugar publicado se representa con un marcador (uno por lugar).
+ *  ✅ Al seleccionar un marcador se muestra información básica (PlacePopup).
+ *  ✅ No se renderizan marcadores duplicados (deduplicación por id con useMemo).
+ */
 const MapView = ({ lugares = [], userLocation, onMapClick, onResena, onEdit, onDelete }) => {
-  
-  const MapEvents = () => {
-    useMapEvents({
-      click(e) {
-        if (onMapClick) onMapClick(e.latlng);
-      },
-    });
-    return null;
-  };
+  /**
+   * Deduplicar: si por alguna razón llegan lugares con id repetido,
+   * el Map garantiza que solo se queda el primero con ese id.
+   */
+  const lugaresUnicos = useMemo(() => {
+    const seen = new Map();
+    for (const lugar of lugares) {
+      if (!seen.has(lugar.id)) {
+        seen.set(lugar.id, lugar);
+      }
+    }
+    return Array.from(seen.values());
+  }, [lugares]);
 
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
-      <MapContainer 
-        center={[4.3920, -76.0710]} 
-        zoom={15} 
+      <MapContainer
+        center={[4.3920, -76.0710]}
+        zoom={15}
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}
       >
@@ -50,42 +77,35 @@ const MapView = ({ lugares = [], userLocation, onMapClick, onResena, onEdit, onD
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        
-        <MapEvents />
 
-        {/* --- MARCADOR ROJO (UBICACIÓN USUARIO) --- */}
+        <MapEvents onMapClick={onMapClick} />
+
+        {/* --- MARCADOR DE USUARIO (rojo) --- */}
         {userLocation && (
           <Marker position={[userLocation.lat, userLocation.lng]} icon={redIcon}>
             <Popup>
-              <div style={{ textAlign: 'center' }}>
+              <div style={{ textAlign: 'center', padding: '8px' }}>
                 <strong>📍 Estás aquí</strong><br />
-                Tu posición real detectada.
+                Tu posición actual.
               </div>
             </Popup>
           </Marker>
         )}
 
-        {/* --- MARCADORES AZULES (LUGARES DE ZARZAL) --- */}
-        {lugares.map((lugar) => (
-          <Marker 
-            key={lugar.id} 
+        {/* --- MARCADORES DE LUGARES (deduplicados) --- */}
+        {lugaresUnicos.map((lugar) => (
+          <Marker
+            key={lugar.id}
             position={[lugar.latitud, lugar.longitud]}
+            icon={createCategoryIcon(lugar.categoriaColor, lugar.categoriaIcono)}
           >
             <Popup>
-              <div className="popup-card">
-                <span className="category-tag">{lugar.categoria}</span>
-                <h3>{lugar.nombre}</h3>
-                <p>{lugar.descripcion || 'Sin descripción disponible.'}</p>
-                
-                <button className="btn-resena-main" onClick={() => onResena(lugar.id)}>
-                  ⭐ Reseñar
-                </button>
-                
-                <div className="admin-tools-row">
-                  <button className="btn-tool" onClick={() => onEdit(lugar)} title="Editar">✏️</button>
-                  <button className="btn-tool btn-del" onClick={() => onDelete(lugar.id)} title="Eliminar">🗑️</button>
-                </div>
-              </div>
+              <PlacePopup
+                lugar={lugar}
+                onResena={onResena}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
             </Popup>
           </Marker>
         ))}

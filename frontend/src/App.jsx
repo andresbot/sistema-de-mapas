@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from './services/api.js';
 import MapView from './components/MapContainer';
 import Navbar from './components/Navbar';
 import BottomNav from './components/BottomNav';
 import { RegisterForm } from './components/RegisterForm';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { getLugares } from './services/placesService';
 import './App.css';
 
-// Configurar interceptor de axios para enviar el JWT
-axios.interceptors.request.use(config => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// Nota: el interceptor JWT ya vive en services/api.js — no se duplica aquí.
 
 function AppContent() {
   const { user, loading, logout, isAuthenticated } = useAuth();
@@ -35,9 +29,11 @@ function AppContent() {
 
   const fetchLugares = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/lugares');
-      setLugares(res.data);
-    } catch (err) { console.error("❌ Error cargando datos:", err); }
+      const data = await getLugares();
+      setLugares(data);
+    } catch (err) {
+      console.error('❌ Error cargando lugares:', err);
+    }
   };
 
   // --- CARGA DE DATOS Y GPS ---
@@ -76,6 +72,11 @@ function AppContent() {
 
   // --- ACCIONES DEL MAPA ---
   const handleMapClick = (coords) => {
+    if (!isAuthenticated) {
+      alert("Debes iniciar sesión para agregar un nuevo lugar.");
+      setView('perfil'); // Redirigir al login/perfil
+      return;
+    }
     setSelectedCoords(coords);
     setShowModal(true);
   };
@@ -88,7 +89,7 @@ function AppContent() {
         latitud: selectedCoords.lat,
         longitud: selectedCoords.lng
       };
-      await axios.post('http://localhost:3000/api/lugares', datosParaEnviar);
+      await api.post('/lugares', datosParaEnviar);
       setShowModal(false);
       setNuevoLugar({ nombre: '', categoria: 'Restaurante', descripcion: '' });
       fetchLugares();
@@ -101,7 +102,7 @@ function AppContent() {
   const handleDelete = async (id) => {
     if (window.confirm("¿Estás seguro de eliminar este lugar?")) {
       try {
-        await axios.delete(`http://localhost:3000/api/lugares/${id}`);
+        await api.delete(`/lugares/${id}`);
         fetchLugares();
       } catch (err) {
         alert("Error al eliminar");
@@ -129,7 +130,6 @@ function AppContent() {
             userLocation={userLocation}
             onMapClick={handleMapClick}
             onDelete={handleDelete}
-            onResena={(id) => alert("Reseñar lugar ID: " + id)}
           />
         ) : (
           <div className="perfil-section" style={{ padding: '20px', display: 'flex', justifyContent: 'center' }}>
