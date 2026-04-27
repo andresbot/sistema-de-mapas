@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
  * Muestra: nombre, categoría, descripción, detalles y puntuación.
  * Permite eliminar si el usuario está autenticado.
  */
-const PlacePopup = ({ lugar, onDelete }) => {
+const PlacePopup = ({ lugar, onOpenDetail, onDelete }) => {
   const { isAuthenticated } = useAuth();
 
   const icon = lugar.categoriaIcono || '📍';
@@ -59,9 +59,12 @@ const PlacePopup = ({ lugar, onDelete }) => {
 
       {/* Acciones */}
       <div className="popup-actions">
-        {/* Reseñar — funcionalidad próximamente */}
-        <button className="btn-resena-main" disabled title="Próximamente">
-          ⭐ Reseñar
+        <button
+          className="btn-resena-main"
+          onClick={() => onOpenDetail?.(lugar)}
+          title="Ver detalle"
+        >
+          🔎 Ver detalle
         </button>
 
         {/* Eliminar — solo usuarios autenticados */}

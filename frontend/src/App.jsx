@@ -1,14 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import api from './services/api.js';
-import MapView from './components/MapContainer';
-import Navbar from './components/Navbar';
-import BottomNav from './components/BottomNav';
-import { RegisterForm } from './components/RegisterForm';
+import React, { useEffect, useMemo, useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+import api from './services/api.js';
 import { getLugares } from './services/placesService';
-import './App.css';
+import {
+  AddPlaceScreen,
+  DetailScreen,
+  ExplorerScreen,
+  ProfileScreen,
+  SavedScreen,
+} from './components/ScreenViews';
+import {
+  FALLBACK_CENTER,
+} from './data/demoContent';
+
+/* eslint-disable react-hooks/set-state-in-effect */
 
 // Nota: el interceptor JWT ya vive en services/api.js — no se duplica aquí.
+
+const initialForm = {
+  nombre: '',
+  categoria: 'Restaurante',
+  descripcion: '',
+  review: '',
+};
+
+const parseCategory = (value = 'General') => value || 'General';
 
 function AppContent() {
   const { user, loading, logout, isAuthenticated } = useAuth();
@@ -17,15 +34,11 @@ function AppContent() {
   const [categoriaSel, setCategoriaSel] = useState('Todos');
   const [busqueda, setBusqueda] = useState("");
   const [userLocation, setUserLocation] = useState(null);
+  const [selectedPlaceId, setSelectedPlaceId] = useState(null);
+  const [pendingAfterAuth, setPendingAfterAuth] = useState(null);
 
-  // --- ESTADOS PARA EL MODAL DE NUEVO LUGAR ---
-  const [showModal, setShowModal] = useState(false);
   const [selectedCoords, setSelectedCoords] = useState(null);
-  const [nuevoLugar, setNuevoLugar] = useState({
-    nombre: '',
-    categoria: 'Restaurante',
-    descripcion: ''
-  });
+  const [nuevoLugar, setNuevoLugar] = useState(initialForm);
 
   const fetchLugares = async () => {
     try {
@@ -35,6 +48,33 @@ function AppContent() {
       console.error('❌ Error cargando lugares:', err);
     }
   };
+
+  const places = lugares;
+
+  const filteredPlaces = useMemo(() => {
+    const normalizedSearch = busqueda.trim().toLowerCase();
+    return places.filter((place) => {
+      const categoryMatch =
+        categoriaSel === 'Todos' || parseCategory(place.categoria).toLowerCase() === categoriaSel.toLowerCase();
+      const searchMatch =
+        !normalizedSearch ||
+        [place.nombre, place.descripcion, place.categoria, place.direccion]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+          .includes(normalizedSearch);
+      return categoryMatch && searchMatch;
+    });
+  }, [places, busqueda, categoriaSel]);
+
+  const selectedPlace = useMemo(() => {
+    return (
+      places.find((place) => place.id === selectedPlaceId) ||
+      filteredPlaces[0] ||
+      places[0] ||
+      null
+    );
+  }, [filteredPlaces, places, selectedPlaceId]);
 
   // --- CARGA DE DATOS Y GPS ---
   useEffect(() => {
@@ -49,52 +89,98 @@ function AppContent() {
   }, []);
 
   if (loading) {
-    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Cargando...</div>;
+    return (
+      <div className="loading-screen">
+        <div style={{ textAlign: 'center' }}>
+          <div className="loading-spinner" style={{ margin: '0 auto 1rem' }} />
+          <div className="brand-mark brand-mark--big" style={{ margin: '0 auto 0.8rem' }}>MR</div>
+          <p style={{ color: 'var(--text-2)', fontSize: '0.9rem' }}>Cargando Mapa de Reseñas…</p>
+        </div>
+      </div>
+    );
   }
 
-  // --- FUNCIÓN DE REDIRECCIÓN (AUTH) ---
   const handleAuthSuccess = () => {
-    setView('mapa'); // Te manda al mapa inmediatamente
+    if (pendingAfterAuth?.view === 'añadir') {
+      setSelectedCoords(pendingAfterAuth.coords || userLocation || FALLBACK_CENTER);
+      setView('añadir');
+    } else {
+      setView('perfil');
+    }
+    setPendingAfterAuth(null);
   };
 
   const handleLogout = () => {
     logout();
     setView('perfil');
-    setShowModal(false);
+    setPendingAfterAuth(null);
   };
 
-  // --- LÓGICA DE FILTRADO ---
-  const lugaresFiltrados = lugares.filter(l => {
-    const cat = categoriaSel === 'Todos' || l.categoria.toLowerCase() === categoriaSel.toLowerCase();
-    const bus = l.nombre.toLowerCase().includes(busqueda.toLowerCase());
-    return cat && bus;
-  });
+  const requireAuth = (nextView, coords) => {
+    if (isAuthenticated) {
+      return true;
+    }
 
-  // --- ACCIONES DEL MAPA ---
+    setPendingAfterAuth({ view: nextView, coords });
+    setView('perfil');
+    return false;
+  };
+
   const handleMapClick = (coords) => {
-    if (!isAuthenticated) {
-      alert("Debes iniciar sesión para agregar un nuevo lugar.");
-      setView('perfil'); // Redirigir al login/perfil
+    if (!requireAuth('añadir', coords)) {
       return;
     }
+
     setSelectedCoords(coords);
-    setShowModal(true);
+    setNuevoLugar(initialForm);
+    setView('añadir');
+  };
+
+  const handleOpenAdd = () => {
+    if (!requireAuth('añadir', selectedCoords || userLocation || FALLBACK_CENTER)) {
+      return;
+    }
+
+    setSelectedCoords(selectedCoords || userLocation || FALLBACK_CENTER);
+    setNuevoLugar(initialForm);
+    setView('añadir');
+  };
+
+  const handleSelectPlace = (place) => {
+    setSelectedPlaceId(place.id);
+    setView('detalle');
+  };
+
+  const navigate = (target) => {
+    if (target === 'añadir') {
+      handleOpenAdd();
+      return;
+    }
+
+    setView(target);
   };
 
   const guardarLugar = async (e) => {
     e.preventDefault();
     try {
+      const coords = selectedCoords || userLocation || FALLBACK_CENTER;
       const datosParaEnviar = {
         ...nuevoLugar,
-        latitud: selectedCoords.lat,
-        longitud: selectedCoords.lng
+        latitud: coords.lat,
+        longitud: coords.lng
       };
-      await api.post('/lugares', datosParaEnviar);
-      setShowModal(false);
-      setNuevoLugar({ nombre: '', categoria: 'Restaurante', descripcion: '' });
-      fetchLugares();
-      alert("✅ ¡Lugar guardado con éxito!");
-    } catch (err) {
+      const response = await api.post('/lugares', datosParaEnviar);
+      const createdPlace = response.data?.data;
+
+      setNuevoLugar(initialForm);
+      setSelectedCoords(coords);
+      await fetchLugares();
+
+      if (createdPlace?.id) {
+        setSelectedPlaceId(createdPlace.id);
+      }
+      setView('detalle');
+    } catch {
       alert("❌ Error al conectar con el servidor.");
     }
   };
@@ -103,99 +189,107 @@ function AppContent() {
     if (window.confirm("¿Estás seguro de eliminar este lugar?")) {
       try {
         await api.delete(`/lugares/${id}`);
-        fetchLugares();
-      } catch (err) {
+        await fetchLugares();
+        setSelectedPlaceId((current) => (current === id ? null : current));
+        setView('mapa');
+      } catch {
         alert("Error al eliminar");
       }
     }
   };
 
+  const goToMap = () => setView('mapa');
+
+  const handleAddReview = async (lugarId, reviewData) => {
+    try {
+      if (!isAuthenticated) {
+        setPendingAfterAuth({ view: 'detalle' });
+        setView('perfil');
+        return;
+      }
+      await api.post(`/lugares/${lugarId}/resenas`, reviewData);
+      await fetchLugares(); 
+    } catch (err) {
+      alert(err.response?.data?.message || "Error al añadir reseña. Puede que ya hayas reseñado este lugar.");
+    }
+  };
+
   return (
     <div className="app-container">
-      {/* Navbar solo en mapa */}
       {view === 'mapa' && (
-        <Navbar
-          onFilter={setCategoriaSel}
-          onSearch={setBusqueda}
-          categoriaActiva={categoriaSel}
+        <ExplorerScreen
+          places={places}
+          filteredPlaces={filteredPlaces}
+          search={busqueda}
+          setSearch={setBusqueda}
+          category={categoriaSel}
+          setCategory={setCategoriaSel}
+          onSelectPlace={handleSelectPlace}
+          onOpenAdd={handleOpenAdd}
+          onNavigate={navigate}
+          onMapClick={handleMapClick}
+          userLocation={userLocation}
           isAuthenticated={isAuthenticated}
+          user={user}
           onLogout={handleLogout}
         />
       )}
 
-      <main className="main-content">
-        {view === 'mapa' ? (
-          <MapView
-            lugares={lugaresFiltrados}
-            userLocation={userLocation}
-            onMapClick={handleMapClick}
-            onDelete={handleDelete}
-          />
-        ) : (
-          <div className="perfil-section" style={{ padding: '20px', display: 'flex', justifyContent: 'center' }}>
-            {isAuthenticated ? (
-              <div className="user-card" style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '50px' }}>👤</div>
-                <h2>Hola, {user?.nombre || 'Explorador'}</h2>
-                <p>Bienvenido a Zarzal Explorer</p>
-                <button
-                  onClick={handleLogout}
-                  className="btn-logout"
-                  style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer', borderRadius: '8px', border: '1px solid red', color: 'red', background: 'none' }}
-                >
-                  Cerrar Sesión
-                </button>
-              </div>
-            ) : (
-              <RegisterForm onAuthSuccess={handleAuthSuccess} />
-            )}
-          </div>
-        )}
-      </main>
-
-      {/* --- MODAL PARA AGREGAR LUGAR --- */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>📍 Nuevo punto en Zarzal</h3>
-            <form onSubmit={guardarLugar}>
-              <label>Nombre:</label>
-              <input
-                type="text"
-                required
-                value={nuevoLugar.nombre}
-                onChange={(e) => setNuevoLugar({ ...nuevoLugar, nombre: e.target.value })}
-              />
-              <label>Categoría:</label>
-              <select
-                value={nuevoLugar.categoria}
-                onChange={(e) => setNuevoLugar({ ...nuevoLugar, categoria: e.target.value })}
-              >
-                <option value="Restaurante">🍴 Restaurante</option>
-                <option value="Parque">🌳 Parque</option>
-                <option value="Cultura">🎭 Cultura</option>
-                <option value="Tienda">🛍️ Tienda</option>
-                <option value="Servicio">🛠️ Servicio</option>
-                <option value="Turismo">🏛️ Turismo</option>
-              </select>
-              <div className="modal-buttons">
-                <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Cancelar</button>
-                <button type="submit" className="btn-save">Guardar</button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {view === 'detalle' && selectedPlace && (
+        <DetailScreen
+          place={selectedPlace}
+          onBack={goToMap}
+          onNavigate={navigate}
+          onSelectPlace={handleSelectPlace}
+          relatedPlaces={filteredPlaces}
+          onOpenAdd={handleOpenAdd}
+          onDelete={handleDelete}
+          onAddReview={handleAddReview}
+        />
       )}
 
-      <BottomNav activeTab={view} setActiveTab={setView} />
+      {view === 'añadir' && (
+        <AddPlaceScreen
+          values={nuevoLugar}
+          setValues={setNuevoLugar}
+          coords={selectedCoords || userLocation || FALLBACK_CENTER}
+          onCoordsChange={setSelectedCoords}
+          onSubmit={guardarLugar}
+          onBack={goToMap}
+          onUseCurrentLocation={() => setSelectedCoords(userLocation || FALLBACK_CENTER)}
+          userLocation={userLocation}
+          isAuthenticated={isAuthenticated}
+          onNavigate={navigate}
+        />
+      )}
+
+      {view === 'guardados' && (
+        <SavedScreen
+          onNavigate={navigate}
+          places={filteredPlaces}
+          onSelectPlace={handleSelectPlace}
+        />
+      )}
+
+      {view === 'perfil' && (
+        <ProfileScreen
+          user={user}
+          isAuthenticated={isAuthenticated}
+          onLogout={handleLogout}
+          onNavigate={navigate}
+          onAuthSuccess={handleAuthSuccess}
+        />
+      )}
     </div>
   );
 }
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

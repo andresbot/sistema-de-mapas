@@ -30,24 +30,88 @@ export const RegisterForm = ({ onAuthSuccess }) => {
   };
 
   return (
-    <div style={{ background: 'white', padding: '30px', borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', width: '320px' }}>
-      <h2 style={{ textAlign: 'center', color: '#1d4ed8' }}>{isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}</h2>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+    <div className="auth-card glass-card">
+      <div className="auth-card__header">
+        <div className="brand-mark brand-mark--big">MR</div>
+        <div>
+          <h2>Mapa de Reseñas</h2>
+          <p>Your trusted city guide.</p>
+        </div>
+      </div>
+
+      <nav className="auth-toggle" aria-label="Authentication modes">
+        <button
+          type="button"
+          className={`auth-toggle__tab ${isLogin ? 'is-active' : ''}`}
+          onClick={() => setIsLogin(true)}
+        >
+          Iniciar sesión
+        </button>
+        <button
+          type="button"
+          className={`auth-toggle__tab ${!isLogin ? 'is-active' : ''}`}
+          onClick={() => setIsLogin(false)}
+        >
+          Crear cuenta
+        </button>
+      </nav>
+
+      <form onSubmit={handleSubmit} className="auth-form">
         {!isLogin && (
-          <input placeholder="Nombre de usuario" value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} required style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ddd' }} />
+          <label className="field">
+            Nombre
+            <input
+              placeholder="Camilo Triana"
+              value={formData.nombre}
+              onChange={(event) => setFormData({ ...formData, nombre: event.target.value })}
+              required
+            />
+          </label>
         )}
-        <input type="email" placeholder="Email" onChange={e => setFormData({...formData, email: e.target.value})} required style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ddd' }} />
-        <input type="password" placeholder="Contraseña" onChange={e => setFormData({...formData, password: e.target.value})} required style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ddd' }} />
-        {errorMsg && <p style={{ color: 'red', fontSize: '13px', textAlign: 'center' }}>{errorMsg}</p>}
-        <button type="submit" style={{ background: '#2563eb', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+        <label className="field">
+          Email
+          <input
+            type="email"
+            placeholder="jtriaha@gmail.com"
+            value={formData.email}
+            onChange={(event) => setFormData({ ...formData, email: event.target.value })}
+            required
+          />
+        </label>
+        <label className="field">
+          Contraseña
+          <input
+            type="password"
+            placeholder="••••••••"
+            value={formData.password}
+            onChange={(event) => setFormData({ ...formData, password: event.target.value })}
+            required
+          />
+        </label>
+
+        {errorMsg && <p className="auth-error">{errorMsg}</p>}
+
+        <button type="submit" className="pill-button pill-button--primary pill-button--block auth-submit">
           {isLogin ? 'Entrar' : 'Registrarme'}
         </button>
       </form>
-      <p style={{ textAlign: 'center', marginTop: '15px', fontSize: '14px' }}>
-        {isLogin ? "¿No tienes cuenta?" : "¿Ya estás registrado?"} 
-        <span onClick={() => setIsLogin(!isLogin)} style={{ color: '#2563eb', cursor: 'pointer', fontWeight: 'bold', marginLeft: '5px' }}>
+
+      <div className="auth-divider">
+        <span />
+        <small>O continúa con</small>
+        <span />
+      </div>
+
+      <div className="social-row">
+        <button type="button" className="social-button">Google</button>
+        <button type="button" className="social-button">GitHub</button>
+      </div>
+
+      <p className="auth-switch">
+        {isLogin ? '¿No tienes cuenta?' : '¿Ya estás registrado?'}
+        <button type="button" onClick={() => setIsLogin(!isLogin)}>
           {isLogin ? 'Regístrate aquí' : 'Inicia sesión'}
-        </span>
+        </button>
       </p>
     </div>
   );

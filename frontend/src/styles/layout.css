@@ -1,0 +1,87 @@
+/* ===== LAYOUT ===== */
+.app-container { min-height: 100vh; width: 100%; position: relative; overflow-x: hidden; }
+
+.screen-shell {
+  min-height: 100vh; position: relative; overflow: hidden;
+  padding-bottom: 5.5rem;
+  animation: fadeUp 0.4s var(--ease) both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.loading-screen {
+  min-height: 100vh; display: grid; place-items: center;
+  background: var(--bg-base);
+}
+
+.loading-spinner {
+  width: 3rem; height: 3rem; border-radius: 50%;
+  border: 3px solid var(--border-s);
+  border-top-color: var(--accent);
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== GLASS CARD (universal) ===== */
+.glass-card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--sh-md);
+  border-radius: var(--r-xl);
+  transition: box-shadow var(--ease), border-color var(--ease), background var(--ease-slow);
+}
+
+.glass-card:hover { box-shadow: var(--sh-lg); }
+
+.glass-card--solid {
+  background: var(--bg-glass-strong);
+}
+
+/* ===== AMBIENT BLOBS ===== */
+.ambient {
+  position: absolute; border-radius: 50%; filter: blur(80px);
+  pointer-events: none; opacity: 0.5; z-index: 0;
+}
+
+.ambient-a {
+  width: 30rem; height: 30rem; top: -12rem; left: -10rem;
+  background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+}
+
+.ambient-b {
+  width: 24rem; height: 24rem; right: -8rem; top: 12rem;
+  background: radial-gradient(circle, rgba(249,115,22,0.12), transparent 70%);
+}
+
+/* ===== HEADER ===== */
+.screen-header {
+  position: relative; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; padding: 1rem 1.25rem 0;
+}
+
+.screen-header__brand { display: flex; align-items: center; gap: 0.75rem; }
+
+.brand-mark {
+  width: 2.5rem; height: 2.5rem; border-radius: var(--r-md);
+  display: grid; place-items: center;
+  font-weight: 800; font-size: 0.75rem; letter-spacing: 0.06em;
+  background: var(--accent-grad); color: #fff;
+  box-shadow: 0 8px 20px var(--accent-glow);
+}
+
+.brand-mark--big { width: 3.2rem; height: 3.2rem; border-radius: 18px; }
+
+.screen-header__title {
+  font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em;
+}
+
+.screen-header__subtitle { color: var(--text-2); font-size: 0.82rem; }
+
+.screen-header__actions { display: flex; align-items: center; gap: 0.6rem; }

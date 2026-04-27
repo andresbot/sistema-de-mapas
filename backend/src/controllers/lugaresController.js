@@ -7,6 +7,12 @@ export const getLugares = async (req, res) => {
         categoria: {
           select: { nombre: true, icono: true, color: true },
         },
+        resenas: {
+          include: {
+            usuario: { select: { nombre: true, avatar: true } }
+          },
+          orderBy: { createdAt: 'desc' }
+        }
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -26,6 +32,7 @@ export const getLugares = async (req, res) => {
       categoria: lugar.categoria?.nombre || 'General',
       categoriaIcono: lugar.categoria?.icono || '📍',
       categoriaColor: lugar.categoria?.color || '#007AFF',
+      resenas: lugar.resenas || [],
     }));
 
     res.json(response);
@@ -115,6 +122,64 @@ export const eliminarLugar = async (req, res) => {
 
     await prisma.lugar.delete({ where: { id } });
     res.json({ success: true, message: 'Lugar eliminado correctamente' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const agregarResena = async (req, res) => {
+  try {
+    const { id } = req.params; // id del lugar
+    const { puntuacion, comentario } = req.body;
+    const usuarioId = req.user.id;
+
+    if (!puntuacion || puntuacion < 1 || puntuacion > 5) {
+      return res.status(400).json({ success: false, message: 'La puntuación debe ser entre 1 y 5' });
+    }
+
+    // Verificar si el usuario ya reseñó este lugar
+    const resenaExistente = await prisma.resena.findUnique({
+      where: {
+        lugarId_usuarioId: {
+          lugarId: id,
+          usuarioId: usuarioId,
+        }
+      }
+    });
+
+    if (resenaExistente) {
+      return res.status(400).json({ success: false, message: 'Ya has reseñado este lugar' });
+    }
+
+    // Crear la reseña
+    const nuevaResena = await prisma.resena.create({
+      data: {
+        puntuacion,
+        comentario,
+        lugarId: id,
+        usuarioId
+      },
+      include: {
+        usuario: { select: { nombre: true, avatar: true } }
+      }
+    });
+
+    // Actualizar los agregados del lugar
+    const agregados = await prisma.resena.aggregate({
+      where: { lugarId: id },
+      _avg: { puntuacion: true },
+      _count: { _all: true }
+    });
+
+    await prisma.lugar.update({
+      where: { id },
+      data: {
+        puntuacionPromedio: agregados._avg.puntuacion || 0,
+        totalResenas: agregados._count._all
+      }
+    });
+
+    res.status(201).json({ success: true, data: nuevaResena });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

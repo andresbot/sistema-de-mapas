@@ -1,56 +1,20 @@
-import React, { useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import React, { useMemo, useState, useCallback } from 'react';
+import MapGL, { Marker, Popup } from 'react-map-gl/mapbox';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { useTheme } from '../context/ThemeContext';
 import PlacePopup from './PlacePopup';
 
-// ----- Icono de usuario (rojo) -----
-const redIcon = L.icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-});
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
+// El usuario proporcionó este estilo específico enfocado en Zarzal
+const MAPBOX_STYLE = 'mapbox://styles/camilotriana0/cmohdb83m006v01qrbeol6y0m';
 
 /**
- * Genera un DivIcon circular con el color de la categoría del lugar.
- * Permite distinguir visualmente cada categoría sin depender de imágenes externas.
+ * Vista principal del mapa usando Mapbox GL.
  */
-const createCategoryIcon = (color = '#007AFF', emoji = '📍') =>
-  L.divIcon({
-    className: '',
-    html: `
-      <div class="custom-marker" style="background:${color};">
-        <span class="custom-marker-emoji">${emoji}</span>
-      </div>
-      <div class="custom-marker-tip" style="border-top-color:${color};"></div>
-    `,
-    iconSize: [40, 48],
-    iconAnchor: [20, 48],
-    popupAnchor: [0, -50],
-  });
+const MapView = ({ lugares = [], userLocation, onMapClick, onOpenDetail, onDelete, className = '', style = {} }) => {
+  const { isDark } = useTheme();
+  const [popupInfo, setPopupInfo] = useState(null);
 
-// ----- Subcomponente de eventos de mapa -----
-const MapEvents = ({ onMapClick }) => {
-  useMapEvents({
-    click(e) {
-      if (onMapClick) onMapClick(e.latlng);
-    },
-  });
-  return null;
-};
-
-/**
- * Vista principal del mapa.
- *
- * Criterios de aceptación cumplidos:
- *  ✅ Cada lugar publicado se representa con un marcador (uno por lugar).
- *  ✅ Al seleccionar un marcador se muestra información básica (PlacePopup).
- *  ✅ No se renderizan marcadores duplicados (deduplicación por id con useMemo).
- */
-const MapView = ({ lugares = [], userLocation, onMapClick, onResena, onEdit, onDelete }) => {
   /**
    * Deduplicar: si por alguna razón llegan lugares con id repetido,
    * el Map garantiza que solo se queda el primero con ese id.
@@ -65,30 +29,36 @@ const MapView = ({ lugares = [], userLocation, onMapClick, onResena, onEdit, onD
     return Array.from(seen.values());
   }, [lugares]);
 
+  const handleMapClick = useCallback((e) => {
+    // Si la interacción es en un lugar, Mapbox pasa un originalEvent
+    if (onMapClick) {
+      onMapClick({ lat: e.lngLat.lat, lng: e.lngLat.lng });
+    }
+    setPopupInfo(null);
+  }, [onMapClick]);
+
   return (
-    <div style={{ height: '100vh', width: '100vw' }}>
-      <MapContainer
-        center={[4.3920, -76.0710]}
-        zoom={15}
-        scrollWheelZoom={true}
-        style={{ height: '100%', width: '100%' }}
+    <div className={`map-view-root ${className}`.trim()} style={{ width: '100%', height: '100%', ...style }}>
+      <MapGL
+        initialViewState={{
+          longitude: -76.0710,
+          latitude: 4.3920,
+          zoom: 15
+        }}
+        style={{ width: '100%', height: '100%' }}
+        mapStyle={MAPBOX_STYLE}
+        mapboxAccessToken={MAPBOX_TOKEN}
+        onClick={handleMapClick}
+        cursor={onMapClick ? 'crosshair' : 'grab'}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-
-        <MapEvents onMapClick={onMapClick} />
-
-        {/* --- MARCADOR DE USUARIO (rojo) --- */}
+        {/* --- MARCADOR DE USUARIO --- */}
         {userLocation && (
-          <Marker position={[userLocation.lat, userLocation.lng]} icon={redIcon}>
-            <Popup>
-              <div style={{ textAlign: 'center', padding: '8px' }}>
-                <strong>📍 Estás aquí</strong><br />
-                Tu posición actual.
-              </div>
-            </Popup>
+          <Marker longitude={userLocation.lng} latitude={userLocation.lat} anchor="bottom">
+            <div style={{
+              width: '20px', height: '20px', backgroundColor: '#ef4444',
+              borderRadius: '50%', border: '3px solid white',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+            }} title="Tu posición actual" />
           </Marker>
         )}
 
@@ -96,20 +66,49 @@ const MapView = ({ lugares = [], userLocation, onMapClick, onResena, onEdit, onD
         {lugaresUnicos.map((lugar) => (
           <Marker
             key={lugar.id}
-            position={[lugar.latitud, lugar.longitud]}
-            icon={createCategoryIcon(lugar.categoriaColor, lugar.categoriaIcono)}
+            longitude={lugar.longitud}
+            latitude={lugar.latitud}
+            anchor="bottom"
+            onClick={e => {
+              // Evita que el clic se propague al mapa y llame a handleMapClick
+              e.originalEvent.stopPropagation();
+              setPopupInfo(lugar);
+            }}
           >
-            <Popup>
-              <PlacePopup
-                lugar={lugar}
-                onResena={onResena}
-                onEdit={onEdit}
-                onDelete={onDelete}
-              />
-            </Popup>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}>
+              <div className="custom-marker" style={{ background: lugar.categoriaColor || '#007AFF' }}>
+                <span className="custom-marker-emoji">{lugar.categoriaIcono || '📍'}</span>
+              </div>
+              <div className="custom-marker-tip" style={{ borderTopColor: lugar.categoriaColor || '#007AFF' }}></div>
+            </div>
           </Marker>
         ))}
-      </MapContainer>
+
+        {/* --- POPUP DE INFORMACIÓN --- */}
+        {popupInfo && (
+          <Popup
+            anchor="top"
+            longitude={popupInfo.longitud}
+            latitude={popupInfo.latitud}
+            onClose={() => setPopupInfo(null)}
+            closeOnClick={false}
+            className="mapbox-popup-override"
+            offset={[0, 10]} // Ajuste para que no tape la punta del marcador
+          >
+            <PlacePopup
+              lugar={popupInfo}
+              onOpenDetail={() => {
+                setPopupInfo(null);
+                if (onOpenDetail) onOpenDetail(popupInfo);
+              }}
+              onDelete={() => {
+                setPopupInfo(null);
+                if (onDelete) onDelete(popupInfo.id);
+              }}
+            />
+          </Popup>
+        )}
+      </MapGL>
     </div>
   );
 };
