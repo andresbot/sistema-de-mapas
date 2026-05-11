@@ -14,13 +14,18 @@ const verifyToken = async (req, res, next) => {
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret_key');
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET no configurado');
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: 'Token inválido o expirado',
+      message: error.message === 'JWT_SECRET no configurado'
+        ? 'Error de configuración del servidor'
+        : 'Token inválido o expirado',
     });
   }
 };

@@ -239,6 +239,11 @@ export function ExplorerScreen({
                       <span>📍 {place.direccion || 'Ubicación sin dirección'}</span>
                       <span>{place.totalResenas || 0} reseñas</span>
                     </div>
+                    {place?.creador && (
+                      <small style={{ color: 'var(--text-3)', marginTop: '0.25rem', display: 'block' }}>
+                        por {place.creador.nombre}
+                      </small>
+                    )}
                   </button>
                 );
               })}
@@ -252,7 +257,7 @@ export function ExplorerScreen({
   );
 }
 
-export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, relatedPlaces = [], onOpenAdd, onDelete, onAddReview }) {
+export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, relatedPlaces = [], onOpenAdd, onDelete, onAddReview, onEdit, currentUserId }) {
   const meta = categoryMeta(place?.categoria);
   const [puntuacion, setPuntuacion] = useState(5);
   const [comentario, setComentario] = useState('');
@@ -275,9 +280,11 @@ export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, related
         onBack={onBack}
         actions={
           <>
-            <button type="button" className="pill-button pill-button--ghost" onClick={onOpenAdd}>
-              Añadir reseña
-            </button>
+            {onEdit && place?.creador?.id === currentUserId && (
+              <button type="button" className="pill-button pill-button--ghost" onClick={() => onEdit(place)}>
+                Editar
+              </button>
+            )}
             <button type="button" className="pill-button pill-button--primary" onClick={() => onNavigate('mapa')}>
               Volver al mapa
             </button>
@@ -307,6 +314,11 @@ export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, related
                   <span>{Number(place?.puntuacionPromedio || 0).toFixed(1)}</span>
                   <small>({place?.totalResenas || 0} reseñas)</small>
                 </div>
+                {place?.creador && (
+                  <p style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: 'var(--text-2)' }}>
+                    Creado por <strong>{place.creador.nombre}</strong>
+                  </p>
+                )}
               </div>
               <button type="button" className="icon-button icon-button--ghost">⭑</button>
             </div>
@@ -423,7 +435,7 @@ export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, related
             </div>
           </section>
 
-          {onDelete && place?.id && (
+          {onDelete && place?.id && place?.creador?.id === currentUserId && (
             <button type="button" className="pill-button pill-button--danger pill-button--block" onClick={() => onDelete(place.id)}>
               Eliminar lugar
             </button>
@@ -447,12 +459,19 @@ export function AddPlaceScreen({
   userLocation,
   isAuthenticated,
   onNavigate,
+  editPlace,
 }) {
+  const isEditing = !!editPlace;
+
+  const handleRatingClick = (rating) => {
+    setValues((current) => ({ ...current, puntuacion: rating }));
+  };
+
   return (
     <div className="screen-shell add-shell">
       <ShellHeader
-        title="Añadir lugar"
-        subtitle="Completa el formulario y marca la ubicación exacta"
+        title={isEditing ? 'Editar lugar' : 'Añadir lugar'}
+        subtitle={isEditing ? 'Actualiza los datos del lugar' : 'Completa el formulario y marca la ubicación exacta'}
         onBack={onBack}
         actions={
           <button type="button" className="pill-button pill-button--ghost" onClick={() => onNavigate('mapa')}>
@@ -464,9 +483,9 @@ export function AddPlaceScreen({
       <main className="add-layout">
         <section className="form-column">
           <header className="section-copy">
-            <p className="eyebrow">Publicar</p>
-            <h1>Añadir lugar y reseña</h1>
-            <p>Comparte la experiencia para que otras personas descubran este punto.</p>
+            <p className="eyebrow">{isEditing ? 'Editar' : 'Publicar'}</p>
+            <h1>{isEditing ? 'Editar lugar' : 'Añadir lugar y reseña'}</h1>
+            <p>{isEditing ? 'Modifica los datos del lugar seleccionado.' : 'Comparte la experiencia para que otras personas descubran este punto.'}</p>
           </header>
 
           <form className="stack-form" onSubmit={onSubmit}>
@@ -502,6 +521,42 @@ export function AddPlaceScreen({
                   value={values.descripcion}
                   onChange={(event) => setValues((current) => ({ ...current, descripcion: event.target.value }))}
                   placeholder="Describe el ambiente, servicio o lo que lo hace especial"
+                />
+              </label>
+              <label>
+                Dirección
+                <input
+                  type="text"
+                  value={values.direccion}
+                  onChange={(event) => setValues((current) => ({ ...current, direccion: event.target.value }))}
+                  placeholder="Ej. Av. Libertador 1234"
+                />
+              </label>
+              <label>
+                Horario
+                <input
+                  type="text"
+                  value={values.horario}
+                  onChange={(event) => setValues((current) => ({ ...current, horario: event.target.value }))}
+                  placeholder="Ej. 08:00 - 20:00"
+                />
+              </label>
+              <label>
+                Teléfono
+                <input
+                  type="text"
+                  value={values.telefono}
+                  onChange={(event) => setValues((current) => ({ ...current, telefono: event.target.value }))}
+                  placeholder="Ej. +57 300 123 4567"
+                />
+              </label>
+              <label>
+                Sitio web
+                <input
+                  type="url"
+                  value={values.sitioWeb}
+                  onChange={(event) => setValues((current) => ({ ...current, sitioWeb: event.target.value }))}
+                  placeholder="Ej. https://ejemplo.com"
                 />
               </label>
             </section>
@@ -574,22 +629,34 @@ export function AddPlaceScreen({
               </div>
             </section>
 
-            <section className="form-card glass-card">
-              <h2>Tu reseña</h2>
-              <label>
-                Calificación
-                <div className="review-stars review-stars--interactive">{ratingIcons(5)}</div>
-              </label>
-              <label>
-                Comentarios
-                <textarea
-                  rows="5"
-                  value={values.review}
-                  onChange={(event) => setValues((current) => ({ ...current, review: event.target.value }))}
-                  placeholder="¿Qué te pareció este lugar?"
-                />
-              </label>
-            </section>
+            {!isEditing && (
+              <section className="form-card glass-card">
+                <h2>Tu reseña</h2>
+                <label>
+                  Calificación
+                  <div className="review-stars review-stars--interactive" style={{ fontSize: '1.5rem', cursor: 'pointer' }}>
+                    {Array.from({ length: 5 }, (_, index) => (
+                      <span
+                        key={index}
+                        className={index < (values.puntuacion || 5) ? 'is-active' : ''}
+                        onClick={() => handleRatingClick(index + 1)}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                </label>
+                <label>
+                  Comentarios
+                  <textarea
+                    rows="5"
+                    value={values.comentario}
+                    onChange={(event) => setValues((current) => ({ ...current, comentario: event.target.value }))}
+                    placeholder="¿Qué te pareció este lugar?"
+                  />
+                </label>
+              </section>
+            )}
 
             <section className="form-card glass-card">
               <h2>Fotos opcionales</h2>
@@ -605,7 +672,7 @@ export function AddPlaceScreen({
                 Cancelar
               </button>
               <button type="submit" className="pill-button pill-button--primary pill-button--wide">
-                Publicar lugar
+                {isEditing ? 'Actualizar lugar' : 'Publicar lugar'}
               </button>
             </div>
           </form>
@@ -614,7 +681,7 @@ export function AddPlaceScreen({
         <aside className="add-side">
           <section className="summary-card glass-card">
             <p className="eyebrow">Resumen</p>
-            <h2>{values.nombre || 'Nuevo lugar'}</h2>
+            <h2>{values.nombre || (isEditing ? 'Editando lugar' : 'Nuevo lugar')}</h2>
             <div className="summary-grid">
               <div>
                 <span>Categoría</span>
@@ -637,11 +704,11 @@ export function AddPlaceScreen({
 
           <section className="summary-card glass-card">
             <p className="eyebrow">Siguiente paso</p>
-            <h2>Lo que hace falta</h2>
+            <h2>{isEditing ? 'Qué puedes cambiar' : 'Lo que hace falta'}</h2>
             <ul className="check-list">
-              <li>Elegir coordenadas exactas</li>
-              <li>Revisar la descripción</li>
-              <li>Publicar el lugar en el mapa</li>
+              <li>{isEditing ? 'Corregir datos del lugar' : 'Elegir coordenadas exactas'}</li>
+              <li>{isEditing ? 'Actualizar ubicación si es necesario' : 'Revisar la descripción'}</li>
+              <li>{isEditing ? 'Guardar los cambios' : 'Publicar el lugar en el mapa'}</li>
             </ul>
             {!isAuthenticated && (
               <button type="button" className="pill-button pill-button--primary pill-button--block" onClick={() => onNavigate('perfil')}>

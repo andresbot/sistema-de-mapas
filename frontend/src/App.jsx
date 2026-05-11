@@ -22,7 +22,12 @@ const initialForm = {
   nombre: '',
   categoria: 'Restaurante',
   descripcion: '',
-  review: '',
+  direccion: '',
+  horario: '',
+  telefono: '',
+  sitioWeb: '',
+  puntuacion: 5,
+  comentario: '',
 };
 
 const parseCategory = (value = 'General') => value || 'General';
@@ -39,6 +44,7 @@ function AppContent() {
 
   const [selectedCoords, setSelectedCoords] = useState(null);
   const [nuevoLugar, setNuevoLugar] = useState(initialForm);
+  const [editPlace, setEditPlace] = useState(null);
 
   const fetchLugares = async () => {
     try {
@@ -126,11 +132,29 @@ function AppContent() {
     return false;
   };
 
+  const handleEditPlace = (place) => {
+    setEditPlace(place);
+    setNuevoLugar({
+      nombre: place.nombre || '',
+      categoria: place.categoria || 'Restaurante',
+      descripcion: place.descripcion || '',
+      direccion: place.direccion || '',
+      horario: place.horario || '',
+      telefono: place.telefono || '',
+      sitioWeb: place.sitioWeb || '',
+      puntuacion: 5,
+      comentario: '',
+    });
+    setSelectedCoords({ lat: place.latitud, lng: place.longitud });
+    setView('añadir');
+  };
+
   const handleMapClick = (coords) => {
     if (!requireAuth('añadir', coords)) {
       return;
     }
 
+    setEditPlace(null);
     setSelectedCoords(coords);
     setNuevoLugar(initialForm);
     setView('añadir');
@@ -141,6 +165,7 @@ function AppContent() {
       return;
     }
 
+    setEditPlace(null);
     setSelectedCoords(selectedCoords || userLocation || FALLBACK_CENTER);
     setNuevoLugar(initialForm);
     setView('añadir');
@@ -165,19 +190,36 @@ function AppContent() {
     try {
       const coords = selectedCoords || userLocation || FALLBACK_CENTER;
       const datosParaEnviar = {
-        ...nuevoLugar,
+        nombre: nuevoLugar.nombre,
+        categoria: nuevoLugar.categoria,
+        descripcion: nuevoLugar.descripcion,
+        direccion: nuevoLugar.direccion,
+        horario: nuevoLugar.horario,
+        telefono: nuevoLugar.telefono,
+        sitioWeb: nuevoLugar.sitioWeb,
         latitud: coords.lat,
-        longitud: coords.lng
+        longitud: coords.lng,
       };
-      const response = await api.post('/lugares', datosParaEnviar);
-      const createdPlace = response.data?.data;
+
+      let placeId;
+
+      if (editPlace) {
+        await api.put(`/lugares/${editPlace.id}`, datosParaEnviar);
+        placeId = editPlace.id;
+      } else {
+        datosParaEnviar.puntuacion = nuevoLugar.puntuacion;
+        datosParaEnviar.comentario = nuevoLugar.comentario;
+        const response = await api.post('/lugares', datosParaEnviar);
+        placeId = response.data?.data?.id;
+      }
 
       setNuevoLugar(initialForm);
+      setEditPlace(null);
       setSelectedCoords(coords);
       await fetchLugares();
 
-      if (createdPlace?.id) {
-        setSelectedPlaceId(createdPlace.id);
+      if (placeId) {
+        setSelectedPlaceId(placeId);
       }
       setView('detalle');
     } catch {
@@ -245,6 +287,8 @@ function AppContent() {
           onOpenAdd={handleOpenAdd}
           onDelete={handleDelete}
           onAddReview={handleAddReview}
+          onEdit={handleEditPlace}
+          currentUserId={user?.id}
         />
       )}
 
@@ -260,6 +304,7 @@ function AppContent() {
           userLocation={userLocation}
           isAuthenticated={isAuthenticated}
           onNavigate={navigate}
+          editPlace={editPlace}
         />
       )}
 
