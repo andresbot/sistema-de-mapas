@@ -142,5 +142,56 @@ Ver [ARCHITECTURE.md](ARCHITECTURE.md) para detalles completos.
 - [ ] Sistema de reseñas
 - [ ] Subida de imágenes
 - [ ] Deploy a producción
-
+ 
 ---
+
+## **Prisma (MySQL)**
+
+- **Resumen**: El backend usa Prisma como ORM con MySQL. El esquema Prisma está en [backend/prisma/schema.prisma](backend/prisma/schema.prisma).
+
+- **Variables de entorno**: Copia `backend/.env.example` a `backend/.env` y ajusta `DATABASE_URL` (ejemplo: `mysql://root:password@localhost:3306/mapas_db`).
+
+- **Comandos útiles**
+
+	- Aplicar migraciones (desarrollo, interactivo — crea/actualiza migraciones y genera el cliente):
+
+		```bash
+		cd backend
+		npx prisma migrate dev
+		```
+
+	- Aplicar migraciones en producción/CI (no interactivo, usa migraciones ya generadas):
+
+		```bash
+		cd backend
+		npx prisma migrate deploy
+		```
+
+	- Generar Prisma Client:
+
+		```bash
+		cd backend
+		npx prisma generate
+		```
+
+	- Sembrar datos (si existe el script):
+
+		```bash
+		cd backend
+		node src/scripts/seed.js
+		```
+
+- **Actualizar Prisma**: si ves un aviso de actualización (por ejemplo `6.x -> 7.x`), actualiza con:
+
+	```bash
+	cd backend
+	npm i --save-dev prisma@latest
+	npm i @prisma/client@latest
+	```
+
+- **Archivos clave**
+	- [backend/prisma/schema.prisma](backend/prisma/schema.prisma)
+	- [backend/prisma/migrations/](backend/prisma/migrations/)
+	- [backend/.env.example](backend/.env.example)
+
+Si quieres, también puedo actualizar la sección **Backend** para reflejar que ahora se usa MySQL + Prisma.
