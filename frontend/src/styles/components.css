@@ -7,86 +7,102 @@
 }
 
 .pill-button, .social-button {
-  padding: 0.75rem 1.15rem; border-radius: var(--r-pill);
+  padding: 0.75rem 1.25rem; border-radius: var(--r-pill);
   font-weight: 700; font-size: 0.88rem;
   display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  letter-spacing: 0.01em;
 }
 
 .pill-button:hover, .icon-button:hover, .social-button:hover,
-.inline-button:hover, .chip:hover { transform: translateY(-1px); }
+.inline-button:hover, .chip:hover { transform: translateY(-2px); }
 
-.pill-button:active { transform: translateY(0) scale(0.98); }
+.pill-button:active { transform: translateY(0) scale(0.97); }
 
 .pill-button--primary {
   background: var(--accent-grad); color: #fff;
-  box-shadow: 0 8px 24px var(--accent-glow);
+  box-shadow: 0 8px 28px var(--accent-glow);
+  border-color: transparent;
 }
-.pill-button--primary:hover { box-shadow: 0 12px 32px var(--accent-glow); }
+.pill-button--primary:hover {
+  box-shadow: 0 12px 40px var(--accent-glow), 0 0 0 1px rgba(124,58,237,0.3);
+}
 
 .pill-button--ghost {
   background: var(--accent-soft); color: var(--text-1);
+  border-color: var(--border-s);
+}
+.pill-button--ghost:hover {
+  background: var(--accent-glow);
   border-color: var(--border-a);
 }
-.pill-button--ghost:hover { background: var(--accent-glow); }
 
 .pill-button--danger {
   background: var(--danger-soft); color: var(--danger);
-  border-color: rgba(239,68,68,0.2);
+  border-color: rgba(239,68,68,0.25);
 }
-.pill-button--danger:hover { background: rgba(239,68,68,0.18); }
+.pill-button--danger:hover { background: rgba(239,68,68,0.2); }
 
 .pill-button--block { width: 100%; }
 .pill-button--wide { min-width: 11rem; }
 
 .icon-button {
-  width: 2.5rem; height: 2.5rem; border-radius: 50%;
+  width: 2.6rem; height: 2.6rem; border-radius: 50%;
   display: grid; place-items: center;
   background: var(--accent-soft); color: var(--text-1);
-  border-color: var(--border-a); font-size: 1rem;
+  border-color: var(--border-s); font-size: 1rem;
 }
 
-.icon-button--ghost {
-  background: transparent; border-color: var(--border);
-}
+.icon-button--ghost { background: transparent; border-color: var(--border); }
+.icon-button:hover { background: var(--accent-glow); border-color: var(--border-a); }
 
 .inline-button {
   background: var(--accent-soft); color: var(--text-2);
-  border-color: var(--border-a);
-  padding: 0.5rem 0.85rem; border-radius: var(--r-pill);
-  font-size: 0.82rem; font-weight: 600;
+  border-color: var(--border-s);
+  padding: 0.5rem 0.9rem; border-radius: var(--r-pill);
+  font-size: 0.82rem; font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.inline-button:hover {
+  background: var(--accent-glow); color: var(--accent); border-color: var(--border-a);
 }
 
 /* ===== THEME TOGGLE ===== */
 .theme-toggle {
-  width: 2.5rem; height: 2.5rem; border-radius: 50%;
+  width: 2.6rem; height: 2.6rem; border-radius: 50%;
   display: grid; place-items: center;
-  background: var(--bg-sunken); border: 1px solid var(--border-s);
+  background: var(--accent-soft); border: 1px solid var(--border-s);
   cursor: pointer; font-size: 1.1rem;
-  transition: transform var(--ease), background var(--ease);
+  transition: transform var(--ease), background var(--ease), box-shadow var(--ease);
 }
-.theme-toggle:hover { transform: rotate(20deg) scale(1.08); }
+.theme-toggle:hover {
+  transform: rotate(20deg) scale(1.1);
+  background: var(--accent-glow);
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
 
 /* ===== CHIPS ===== */
 .chip-row {
-  display: flex; gap: 0.55rem; overflow-x: auto;
+  display: flex; gap: 0.5rem; overflow-x: auto;
   padding-bottom: 0.2rem; scrollbar-width: none;
 }
 .chip-row::-webkit-scrollbar { display: none; }
 
 .chip {
-  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 0.45rem;
-  padding: 0.6rem 0.95rem; border-radius: var(--r-pill);
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.55rem 1rem; border-radius: var(--r-pill);
   background: var(--bg-elevated); color: var(--text-2);
-  border-color: var(--border); font-size: 0.85rem; font-weight: 600;
+  border-color: var(--border-s); font-size: 0.83rem; font-weight: 700;
+  transition: all var(--ease);
 }
 
 .chip.is-active, .chip--static {
   background: var(--accent-soft); color: var(--accent);
   border-color: var(--border-a);
+  box-shadow: 0 4px 16px var(--accent-glow);
 }
 
 /* ===== EYEBROW ===== */
 .eyebrow {
   margin: 0; color: var(--accent); text-transform: uppercase;
-  letter-spacing: 0.12em; font-size: 0.7rem; font-weight: 800;
+  letter-spacing: 0.14em; font-size: 0.68rem; font-weight: 800;
 }
