@@ -43,7 +43,7 @@
 
 /* ===== AMBIENT BLOBS ===== */
 .ambient {
-  position: absolute; border-radius: 50%; filter: blur(100px);
+  position: absolute; border-radius: 50%; filter: blur(100px); -webkit-filter: blur(100px);
   pointer-events: none; opacity: 0.4; z-index: 0;
 }
 
