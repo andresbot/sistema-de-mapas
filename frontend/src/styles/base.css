@@ -1,41 +1,65 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 :root, [data-theme="light"] {
-  --bg-base: #f8f9fc; --bg-elevated: #fff; --bg-sunken: #f0f2f5;
-  --bg-glass: rgba(255,255,255,0.72); --bg-glass-strong: rgba(255,255,255,0.92);
-  --bg-overlay: rgba(15,23,42,0.45);
-  --text-1: #0f172a; --text-2: #475569; --text-3: #94a3b8; --text-inv: #fff;
-  --accent: #0d9488; --accent-h: #0f766e; --accent-soft: rgba(13,148,136,0.12);
-  --accent-glow: rgba(13,148,136,0.25);
-  --accent-grad: linear-gradient(135deg, #0d9488, #f97316);
-  --success: #10b981; --warn: #f59e0b; --danger: #ef4444; --info: #3b82f6;
-  --danger-soft: rgba(239,68,68,0.1); --warn-soft: rgba(245,158,11,0.12);
-  --border: rgba(15,23,42,0.08); --border-s: rgba(15,23,42,0.15);
-  --border-a: rgba(13,148,136,0.3);
-  --sh-sm: 0 1px 3px rgba(15,23,42,0.06);
-  --sh-md: 0 8px 24px rgba(15,23,42,0.08);
-  --sh-lg: 0 20px 48px rgba(15,23,42,0.12);
-  --sh-glow: 0 0 30px rgba(13,148,136,0.15);
-  --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px; --r-pill: 999px;
-  --font: 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --ease: 0.2s cubic-bezier(0.4,0,0.2,1);
-  --ease-slow: 0.4s cubic-bezier(0.4,0,0.2,1);
+  --bg-base: #f4f3ff;
+  --bg-elevated: #ffffff;
+  --bg-sunken: #ede9fe;
+  --bg-glass: rgba(255,255,255,0.72);
+  --bg-glass-strong: rgba(255,255,255,0.92);
+  --bg-overlay: rgba(15,8,42,0.45);
+  --text-1: #1e1033;
+  --text-2: #5b4d7a;
+  --text-3: #9d8fbf;
+  --text-inv: #fff;
+  --accent: #7C3AED;
+  --accent-h: #6D28D9;
+  --accent-soft: rgba(124,58,237,0.1);
+  --accent-glow: rgba(124,58,237,0.2);
+  --accent-grad: linear-gradient(135deg, #7C3AED, #4F46E5);
+  --success: #10b981;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --danger-soft: rgba(239,68,68,0.1);
+  --warn-soft: rgba(245,158,11,0.12);
+  --border: rgba(124,58,237,0.1);
+  --border-s: rgba(124,58,237,0.2);
+  --border-a: rgba(124,58,237,0.4);
+  --sh-sm: 0 1px 4px rgba(124,58,237,0.08);
+  --sh-md: 0 8px 28px rgba(124,58,237,0.12);
+  --sh-lg: 0 20px 60px rgba(124,58,237,0.18);
+  --sh-glow: 0 0 40px rgba(124,58,237,0.2);
+  --r-sm: 10px; --r-md: 16px; --r-lg: 20px; --r-xl: 28px; --r-pill: 999px;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ease: 0.22s cubic-bezier(0.4,0,0.2,1);
+  --ease-slow: 0.45s cubic-bezier(0.4,0,0.2,1);
 }
 
 [data-theme="dark"] {
-  --bg-base: #0c0f17; --bg-elevated: #151922; --bg-sunken: #0a0d14;
-  --bg-glass: rgba(21,25,34,0.78); --bg-glass-strong: rgba(21,25,34,0.94);
-  --bg-overlay: rgba(0,0,0,0.6);
-  --text-1: #e8ecf4; --text-2: #8b95a8; --text-3: #4a5568; --text-inv: #0f172a;
-  --accent: #2dd4bf; --accent-h: #5eead4; --accent-soft: rgba(45,212,191,0.12);
-  --accent-glow: rgba(45,212,191,0.2);
-  --danger-soft: rgba(239,68,68,0.14); --warn-soft: rgba(245,158,11,0.15);
-  --border: rgba(255,255,255,0.06); --border-s: rgba(255,255,255,0.12);
-  --border-a: rgba(45,212,191,0.25);
-  --sh-sm: 0 1px 3px rgba(0,0,0,0.3);
-  --sh-md: 0 8px 24px rgba(0,0,0,0.35);
-  --sh-lg: 0 20px 48px rgba(0,0,0,0.5);
-  --sh-glow: 0 0 40px rgba(45,212,191,0.12);
+  --bg-base: #0d0d14;
+  --bg-elevated: #13131f;
+  --bg-sunken: #0a0a12;
+  --bg-glass: rgba(13,13,20,0.82);
+  --bg-glass-strong: rgba(19,19,31,0.96);
+  --bg-overlay: rgba(0,0,0,0.7);
+  --text-1: #f0f0f8;
+  --text-2: #8888aa;
+  --text-3: #4a4a6a;
+  --text-inv: #0d0d14;
+  --accent: #7C3AED;
+  --accent-h: #9F67F0;
+  --accent-soft: rgba(124,58,237,0.14);
+  --accent-glow: rgba(124,58,237,0.28);
+  --accent-grad: linear-gradient(135deg, #7C3AED, #4F46E5);
+  --danger-soft: rgba(239,68,68,0.14);
+  --warn-soft: rgba(245,158,11,0.15);
+  --border: rgba(124,58,237,0.12);
+  --border-s: rgba(124,58,237,0.22);
+  --border-a: rgba(124,58,237,0.45);
+  --sh-sm: 0 1px 4px rgba(0,0,0,0.4);
+  --sh-md: 0 8px 28px rgba(0,0,0,0.5);
+  --sh-lg: 0 20px 60px rgba(0,0,0,0.7);
+  --sh-glow: 0 0 60px rgba(124,58,237,0.2);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
