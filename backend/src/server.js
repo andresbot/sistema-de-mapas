@@ -5,6 +5,7 @@ import { prisma } from './config/prisma.js';
 import cors from 'cors';
 import authRoutes from './routes/auth.routes.js';
 import lugaresRoutes from './routes/lugares.routes.js';
+import resenasRoutes from './routes/resenas.routes.js';
 
 const app = express();
 const PORT = Number(process.env.PORT || 5000);
@@ -14,6 +15,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api', lugaresRoutes);
+app.use('/api/resenas', resenasRoutes);
 
 app.get('/api/health', async (req, res) => {
   try {
