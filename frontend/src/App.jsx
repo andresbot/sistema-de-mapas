@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import api from './services/api.js';
 import { getLugares } from './services/placesService';
+import Toast from './components/Toast';
 import {
   AddPlaceScreen,
   DetailScreen,
@@ -39,6 +40,11 @@ function AppContent() {
 
   const [selectedCoords, setSelectedCoords] = useState(null);
   const [nuevoLugar, setNuevoLugar] = useState(initialForm);
+  const [toast, setToast] = useState(null);
+
+  const showToast = useCallback((message, type = 'success') => {
+    setToast({ message, type });
+  }, []);
 
   const fetchLugares = async () => {
     try {
@@ -180,8 +186,9 @@ function AppContent() {
         setSelectedPlaceId(createdPlace.id);
       }
       setView('detalle');
+      showToast('Lugar publicado correctamente');
     } catch {
-      alert("❌ Error al conectar con el servidor.");
+      showToast('Error al conectar con el servidor', 'error');
     }
   };
 
@@ -192,8 +199,9 @@ function AppContent() {
         await fetchLugares();
         setSelectedPlaceId((current) => (current === id ? null : current));
         setView('mapa');
+        showToast('Lugar eliminado');
       } catch {
-        alert("Error al eliminar");
+        showToast('Error al eliminar', 'error');
       }
     }
   };
@@ -208,14 +216,32 @@ function AppContent() {
         return;
       }
       await api.post(`/lugares/${lugarId}/resenas`, reviewData);
-      await fetchLugares(); 
+      await fetchLugares();
+      showToast('Reseña publicada');
     } catch (err) {
-      alert(err.response?.data?.message || "Error al añadir reseña. Puede que ya hayas reseñado este lugar.");
+      showToast(err.response?.data?.message || 'Ya has reseñado este lugar', 'error');
+    }
+  };
+
+  const handleDeleteReview = async (lugarId, resenaId) => {
+    try {
+      await api.delete(`/lugares/${lugarId}/resenas/${resenaId}`);
+      await fetchLugares();
+      showToast('Reseña eliminada');
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Error al eliminar la reseña', 'error');
     }
   };
 
   return (
     <div className="app-container">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       {view === 'mapa' && (
         <ExplorerScreen
           places={places}
@@ -245,6 +271,8 @@ function AppContent() {
           onOpenAdd={handleOpenAdd}
           onDelete={handleDelete}
           onAddReview={handleAddReview}
+          onDeleteReview={handleDeleteReview}
+          currentUserId={user?.id}
         />
       )}
 

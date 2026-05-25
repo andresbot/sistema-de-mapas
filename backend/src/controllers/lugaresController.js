@@ -127,6 +127,41 @@ export const eliminarLugar = async (req, res) => {
   }
 };
 
+export const eliminarResena = async (req, res) => {
+  try {
+    const { id, resenaId } = req.params;
+    const usuarioId = req.user.id;
+    const rol = req.user.rol;
+
+    const resena = await prisma.resena.findUnique({ where: { id: resenaId } });
+    if (!resena) return res.status(404).json({ success: false, message: 'Reseña no encontrada' });
+    if (resena.lugarId !== id) return res.status(400).json({ success: false, message: 'La reseña no pertenece a este lugar' });
+    if (resena.usuarioId !== usuarioId && rol !== 'admin') {
+      return res.status(403).json({ success: false, message: 'No tienes permiso para eliminar esta reseña' });
+    }
+
+    await prisma.resena.delete({ where: { id: resenaId } });
+
+    const agregados = await prisma.resena.aggregate({
+      where: { lugarId: id },
+      _avg: { puntuacion: true },
+      _count: { _all: true },
+    });
+
+    await prisma.lugar.update({
+      where: { id },
+      data: {
+        puntuacionPromedio: agregados._avg.puntuacion || 0,
+        totalResenas: agregados._count._all,
+      },
+    });
+
+    res.json({ success: true, message: 'Reseña eliminada correctamente' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export const agregarResena = async (req, res) => {
   try {
     const { id } = req.params; // id del lugar

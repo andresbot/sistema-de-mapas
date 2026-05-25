@@ -252,18 +252,22 @@ export function ExplorerScreen({
   );
 }
 
-export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, relatedPlaces = [], onOpenAdd, onDelete, onAddReview }) {
+export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, relatedPlaces = [], onOpenAdd, onDelete, onAddReview, onDeleteReview, currentUserId }) {
   const meta = categoryMeta(place?.categoria);
   const [puntuacion, setPuntuacion] = useState(5);
   const [comentario, setComentario] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const submitReview = (e) => {
+  const submitReview = async (e) => {
     e.preventDefault();
-    if (!comentario.trim()) return;
-    if (onAddReview) {
-      onAddReview(place.id, { puntuacion, comentario });
+    if (!comentario.trim() || submitting) return;
+    setSubmitting(true);
+    try {
+      await onAddReview?.(place.id, { puntuacion, comentario });
       setComentario('');
       setPuntuacion(5);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -369,8 +373,8 @@ export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, related
                   required
                 />
               </label>
-              <button type="submit" className="pill-button pill-button--primary pill-button--block">
-                Publicar reseña
+              <button type="submit" className="pill-button pill-button--primary pill-button--block" disabled={submitting}>
+                {submitting ? 'Publicando…' : 'Publicar reseña'}
               </button>
             </form>
           </section>
@@ -386,11 +390,23 @@ export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, related
                 place.resenas.map((review) => (
                   <article key={review.id} className="review-card">
                     <div className="review-card__head">
-                      <div className="review-avatar">{initials(review.usuario?.nombre || 'Usuario')}</div>
-                      <div>
-                        <strong>{review.usuario?.nombre || 'Usuario'}</strong>
-                        <p>{new Date(review.createdAt).toLocaleDateString()}</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
+                        <div className="review-avatar">{initials(review.usuario?.nombre || 'Usuario')}</div>
+                        <div>
+                          <strong>{review.usuario?.nombre || 'Usuario'}</strong>
+                          <p>{new Date(review.createdAt).toLocaleDateString()}</p>
+                        </div>
                       </div>
+                      {currentUserId && review.usuarioId === currentUserId && (
+                        <button
+                          type="button"
+                          className="pill-button pill-button--danger"
+                          style={{ padding: '0.35rem 0.7rem', fontSize: '0.75rem' }}
+                          onClick={() => onDeleteReview?.(place.id, review.id)}
+                        >
+                          Eliminar
+                        </button>
+                      )}
                     </div>
                     <div className="review-stars">{ratingIcons(review.puntuacion)}</div>
                     <p>{review.comentario}</p>
