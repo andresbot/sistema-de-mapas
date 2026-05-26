@@ -54,6 +54,11 @@
 
 .icon-button--ghost { background: transparent; border-color: var(--border); }
 .icon-button:hover { background: var(--accent-glow); border-color: var(--border-a); }
+.icon-button--active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--border-a);
+}
 
 .inline-button {
   background: var(--accent-soft); color: var(--text-2);

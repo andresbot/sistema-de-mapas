@@ -252,7 +252,7 @@ export function ExplorerScreen({
   );
 }
 
-export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, relatedPlaces = [], onOpenAdd, onDelete, onAddReview, onDeleteReview, currentUserId }) {
+export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, relatedPlaces = [], onOpenAdd, onDelete, onAddReview, onDeleteReview, currentUserId, isFavorited = false, onToggleFavorito }) {
   const meta = categoryMeta(place?.categoria);
   const [puntuacion, setPuntuacion] = useState(5);
   const [comentario, setComentario] = useState('');
@@ -312,7 +312,14 @@ export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, related
                   <small>({place?.totalResenas || 0} reseñas)</small>
                 </div>
               </div>
-              <button type="button" className="icon-button icon-button--ghost">⭑</button>
+              <button
+                type="button"
+                className={`icon-button${isFavorited ? ' icon-button--active' : ''}`}
+                onClick={() => onToggleFavorito?.(place.id)}
+                aria-label={isFavorited ? 'Quitar de favoritos' : 'Guardar en favoritos'}
+              >
+                {isFavorited ? '🔖' : '🏷️'}
+              </button>
             </div>
 
             <p className="detail-description">
@@ -673,9 +680,8 @@ export function AddPlaceScreen({
   );
 }
 
-export function SavedScreen({ onNavigate, savedPlaces = [], onSelectPlace, places = [] }) {
-  const items = savedPlaces;
-
+export function SavedScreen({ onNavigate, savedPlaces = [], onSelectPlace }) {
+  const isEmpty = savedPlaces.length === 0;
   return (
     <div className="screen-shell profile-shell">
       <ShellHeader
@@ -687,32 +693,30 @@ export function SavedScreen({ onNavigate, savedPlaces = [], onSelectPlace, place
           </button>
         }
       />
-
       <main className="saved-layout glass-card">
-        <div className="empty-state">
-          <p className="eyebrow">Sin guardados</p>
-          <h1>Aún no tienes lugares guardados</h1>
-          <p>
-            Marca algunos lugares como favoritos para reunirlos aquí. Mientras tanto, puedes explorar los destacados.
-          </p>
-        </div>
-
-        <div className="saved-grid">
-          {items.map((place) => {
-            const meta = categoryMeta(place.categoria);
-            return (
-              <button key={place.id} type="button" className="saved-item" onClick={() => onSelectPlace(place)}>
-                <span className="saved-item__icon">{meta.icon}</span>
-                <div>
-                  <strong>{place.nombre}</strong>
-                  <p>{place.categoria}</p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
+        {isEmpty ? (
+          <div className="empty-state">
+            <p className="eyebrow">Sin guardados</p>
+            <h1>Aún no tienes lugares guardados</h1>
+            <p>Marca algunos lugares como favoritos para reunirlos aquí.</p>
+          </div>
+        ) : (
+          <div className="saved-grid">
+            {savedPlaces.map((place) => {
+              const meta = categoryMeta(place.categoria);
+              return (
+                <button key={place.id} type="button" className="saved-item" onClick={() => onSelectPlace(place)}>
+                  <span className="saved-item__icon">{meta.icon}</span>
+                  <div>
+                    <strong>{place.nombre}</strong>
+                    <p>{place.categoria}</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </main>
-
       <DockNav activeView="guardados" onNavigate={onNavigate} isAuthenticated={true} />
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import api from './services/api.js';
-import { getLugares } from './services/placesService';
+import { getLugares, getFavoritos, toggleFavorito } from './services/placesService';
 import Toast from './components/Toast';
 import {
   AddPlaceScreen,
@@ -38,6 +38,9 @@ function AppContent() {
   const [selectedPlaceId, setSelectedPlaceId] = useState(null);
   const [pendingAfterAuth, setPendingAfterAuth] = useState(null);
 
+  const [savedPlaces, setSavedPlaces] = useState([]);
+  const [favoritoIds, setFavoritoIds] = useState(new Set());
+
   const [selectedCoords, setSelectedCoords] = useState(null);
   const [nuevoLugar, setNuevoLugar] = useState(initialForm);
   const [toast, setToast] = useState(null);
@@ -54,6 +57,15 @@ function AppContent() {
       console.error('❌ Error cargando lugares:', err);
     }
   };
+
+  const fetchFavoritos = useCallback(async () => {
+    if (!isAuthenticated) { setSavedPlaces([]); setFavoritoIds(new Set()); return; }
+    try {
+      const data = await getFavoritos();
+      setSavedPlaces(data);
+      setFavoritoIds(new Set(data.map((p) => p.id)));
+    } catch { /* silent */ }
+  }, [isAuthenticated]);
 
   const places = lugares;
 
@@ -85,6 +97,7 @@ function AppContent() {
   // --- CARGA DE DATOS Y GPS ---
   useEffect(() => {
     fetchLugares();
+    fetchFavoritos();
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (p) => setUserLocation({ lat: p.coords.latitude, lng: p.coords.longitude }),
@@ -92,7 +105,7 @@ function AppContent() {
         { enableHighAccuracy: true }
       );
     }
-  }, []);
+  }, [fetchFavoritos]);
 
   if (loading) {
     return (
@@ -206,6 +219,14 @@ function AppContent() {
     }
   };
 
+  const handleToggleFavorito = async (lugarId) => {
+    if (!isAuthenticated) { requireAuth('detalle'); return; }
+    try {
+      await toggleFavorito(lugarId);
+      await fetchFavoritos();
+    } catch { showToast('Error al actualizar favorito', 'error'); }
+  };
+
   const goToMap = () => setView('mapa');
 
   const handleAddReview = async (lugarId, reviewData) => {
@@ -273,6 +294,8 @@ function AppContent() {
           onAddReview={handleAddReview}
           onDeleteReview={handleDeleteReview}
           currentUserId={user?.id}
+          isFavorited={favoritoIds.has(selectedPlace?.id)}
+          onToggleFavorito={handleToggleFavorito}
         />
       )}
 
@@ -294,7 +317,7 @@ function AppContent() {
       {view === 'guardados' && (
         <SavedScreen
           onNavigate={navigate}
-          places={filteredPlaces}
+          savedPlaces={savedPlaces}
           onSelectPlace={handleSelectPlace}
         />
       )}

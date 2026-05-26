@@ -22,8 +22,9 @@ model Usuario {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  lugares Lugar[]
-  resenas Resena[]
+  lugares    Lugar[]
+  resenas    Resena[]
+  favoritos  Favorito[]
 
   @@map("usuarios")
 }
@@ -61,9 +62,10 @@ model Lugar {
   categoriaId String
   creadorId   String
 
-  categoria Categoria @relation(fields: [categoriaId], references: [id])
-  creador   Usuario   @relation(fields: [creadorId], references: [id])
+  categoria Categoria  @relation(fields: [categoriaId], references: [id])
+  creador   Usuario    @relation(fields: [creadorId], references: [id])
   resenas   Resena[]
+  favoritos Favorito[]
 
   @@map("lugares")
 }
@@ -86,4 +88,18 @@ model Resena {
 
   @@unique([lugarId, usuarioId])
   @@map("resenas")
+}
+
+model Favorito {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  lugarId   String
+  usuarioId String
+
+  lugar   Lugar   @relation(fields: [lugarId], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([lugarId, usuarioId])
+  @@map("favoritos")
 }
