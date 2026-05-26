@@ -9,6 +9,7 @@ import {
   DetailScreen,
   ExplorerScreen,
   ProfileScreen,
+  PublicProfileScreen,
   SavedScreen,
 } from './components/ScreenViews';
 import {
@@ -40,6 +41,7 @@ function AppContent() {
 
   const [savedPlaces, setSavedPlaces] = useState([]);
   const [favoritoIds, setFavoritoIds] = useState(new Set());
+  const [publicProfile, setPublicProfile] = useState(null);
 
   const [selectedCoords, setSelectedCoords] = useState(null);
   const [nuevoLugar, setNuevoLugar] = useState(initialForm);
@@ -93,6 +95,16 @@ function AppContent() {
       null
     );
   }, [filteredPlaces, places, selectedPlaceId]);
+
+  const handleOpenPublicProfile = useCallback(async (userId) => {
+    try {
+      const res = await api.get(`/usuarios/${userId}/perfil`);
+      setPublicProfile(res.data);
+      setView('publicProfile');
+    } catch {
+      showToast('No se pudo cargar el perfil', 'error');
+    }
+  }, [showToast]);
 
   // --- CARGA DE DATOS Y GPS ---
   useEffect(() => {
@@ -296,6 +308,7 @@ function AppContent() {
           currentUserId={user?.id}
           isFavorited={favoritoIds.has(selectedPlace?.id)}
           onToggleFavorito={handleToggleFavorito}
+          onOpenPublicProfile={handleOpenPublicProfile}
         />
       )}
 
@@ -319,6 +332,16 @@ function AppContent() {
           onNavigate={navigate}
           savedPlaces={savedPlaces}
           onSelectPlace={handleSelectPlace}
+        />
+      )}
+
+      {view === 'publicProfile' && publicProfile && (
+        <PublicProfileScreen
+          profile={publicProfile}
+          onBack={() => { setPublicProfile(null); setView('detalle'); }}
+          onSelectPlace={handleSelectPlace}
+          onNavigate={navigate}
+          isAuthenticated={isAuthenticated}
         />
       )}
 

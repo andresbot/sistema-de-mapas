@@ -252,7 +252,7 @@ export function ExplorerScreen({
   );
 }
 
-export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, relatedPlaces = [], onOpenAdd, onDelete, onAddReview, onDeleteReview, currentUserId, isFavorited = false, onToggleFavorito }) {
+export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, relatedPlaces = [], onOpenAdd, onDelete, onAddReview, onDeleteReview, currentUserId, isFavorited = false, onToggleFavorito, onOpenPublicProfile }) {
   const meta = categoryMeta(place?.categoria);
   const [puntuacion, setPuntuacion] = useState(5);
   const [comentario, setComentario] = useState('');
@@ -321,6 +321,16 @@ export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, related
                 {isFavorited ? '🔖' : '🏷️'}
               </button>
             </div>
+
+            {place?.creadorId && onOpenPublicProfile && (
+              <button
+                type="button"
+                className="inline-button"
+                onClick={() => onOpenPublicProfile?.(place.creadorId)}
+              >
+                Ver perfil del creador
+              </button>
+            )}
 
             <p className="detail-description">
               {place?.descripcion || 'Este lugar no tiene descripción todavía, pero ya puedes explorar su ubicación y reseñas.'}
@@ -718,6 +728,79 @@ export function SavedScreen({ onNavigate, savedPlaces = [], onSelectPlace }) {
         )}
       </main>
       <DockNav activeView="guardados" onNavigate={onNavigate} isAuthenticated={true} />
+    </div>
+  );
+}
+
+export function PublicProfileScreen({ profile, onBack, onSelectPlace, onNavigate, isAuthenticated = false }) {
+  if (!profile) return null;
+
+  const initials = profile.nombre
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase();
+
+  const sinceYear = profile.miembro ? new Date(profile.miembro).getFullYear() : null;
+
+  return (
+    <div className="screen-shell profile-shell">
+      <ShellHeader
+        title={profile.nombre}
+        subtitle={sinceYear ? `Miembro desde ${sinceYear}` : 'Creador de lugares'}
+        onBack={onBack}
+        actions={
+          <button type="button" className="pill-button pill-button--ghost" onClick={() => onNavigate('mapa')}>
+            Explorar
+          </button>
+        }
+      />
+
+      <main className="profile-layout glass-card">
+        <div className="public-profile-hero">
+          <div className="profile-avatar">
+            {profile.avatar
+              ? <img src={profile.avatar} alt={profile.nombre} />
+              : <span>{initials}</span>
+            }
+          </div>
+          <div>
+            <h2>{profile.nombre}</h2>
+            <p className="eyebrow">{profile.lugares.length} lugar{profile.lugares.length !== 1 ? 'es' : ''} publicado{profile.lugares.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
+
+        {profile.lugares.length === 0 ? (
+          <div className="empty-state">
+            <p className="eyebrow">Sin lugares</p>
+            <h1>Este usuario no ha publicado lugares aún</h1>
+          </div>
+        ) : (
+          <div className="saved-grid">
+            {profile.lugares.map((place) => {
+              const meta = categoryMeta(place.categoria);
+              return (
+                <button
+                  key={place.id}
+                  type="button"
+                  className="saved-item"
+                  onClick={() => onSelectPlace?.(place)}
+                >
+                  <span className="saved-item__icon">{meta.icon}</span>
+                  <div>
+                    <strong>{place.nombre}</strong>
+                    <p>{place.categoria}</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </main>
+
+      <DockNav activeView="mapa" onNavigate={onNavigate} isAuthenticated={isAuthenticated} />
     </div>
   );
 }

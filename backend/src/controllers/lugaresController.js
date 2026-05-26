@@ -32,6 +32,7 @@ export const getLugares = async (req, res) => {
       categoria: lugar.categoria?.nombre || 'General',
       categoriaIcono: lugar.categoria?.icono || '📍',
       categoriaColor: lugar.categoria?.color || '#007AFF',
+      creadorId: lugar.creadorId,
       resenas: lugar.resenas || [],
     }));
 
