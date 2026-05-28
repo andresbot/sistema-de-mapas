@@ -273,3 +273,86 @@
   transform: translateY(-1px);
   background: rgba(220,38,38,0.18);
 }
+
+/* DARK MAP POPUP OVERRIDE */
+.mapbox-popup-override .mapboxgl-popup-content {
+  min-width: 220px;
+  max-width: min(280px, calc(100vw - 2rem));
+  padding: 0 !important;
+  overflow: hidden;
+  color: var(--text-1);
+  background: var(--glass-strong) !important;
+  border: 1px solid var(--amber-border) !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--sh-lg) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.mapbox-popup-override.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
+  border-bottom-color: var(--glass-strong) !important;
+}
+
+.mapbox-popup-override.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+  border-top-color: var(--glass-strong) !important;
+}
+
+.mapbox-popup-override.mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+  border-right-color: var(--glass-strong) !important;
+}
+
+.mapbox-popup-override.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+  border-left-color: var(--glass-strong) !important;
+}
+
+.mapbox-popup-override .mapboxgl-popup-close-button {
+  width: 28px;
+  height: 28px;
+  color: var(--text-2) !important;
+  font-size: 1.15rem;
+  line-height: 28px;
+  transition: color var(--ease), background var(--ease);
+}
+
+.mapbox-popup-override .mapboxgl-popup-close-button:hover {
+  color: var(--amber) !important;
+  background: var(--amber-dim) !important;
+}
+
+.mapbox-popup-override .popup-card {
+  background: transparent;
+  color: var(--text-1);
+}
+
+.mapbox-popup-override .popup-nombre {
+  color: var(--text-1) !important;
+}
+
+.mapbox-popup-override .popup-descripcion,
+.mapbox-popup-override .popup-details li {
+  color: var(--text-2) !important;
+}
+
+.mapbox-popup-override .popup-details,
+.mapbox-popup-override .popup-actions {
+  border-top-color: rgba(245,158,11,0.08);
+}
+
+.mapbox-popup-override .popup-rating-text,
+.mapbox-popup-override .popup-sin-resenas {
+  color: var(--text-3) !important;
+}
+
+.mapbox-popup-override .popup-actions .btn-resena-main {
+  color: var(--text-inv) !important;
+}
+
+.mapbox-popup-override .btn-delete-place {
+  color: var(--danger) !important;
+  background: var(--danger-soft);
+  border-color: rgba(239,68,68,0.24);
+}
+
+.mapbox-popup-override .btn-delete-place:hover {
+  background: rgba(239,68,68,0.2);
+}
