@@ -257,6 +257,8 @@ export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, related
   const [puntuacion, setPuntuacion] = useState(5);
   const [comentario, setComentario] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [reportingReviewId, setReportingReviewId] = useState(null);
+  const [reportMotivo, setReportMotivo] = useState('spam');
 
   const submitReview = async (e) => {
     e.preventDefault();
@@ -434,15 +436,51 @@ export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, related
                         </button>
                       )}
                       {currentUserId && review.usuarioId !== currentUserId && (
-                        <button
-                          type="button"
-                          className="pill-button pill-button--ghost"
-                          style={{ padding: '0.35rem 0.7rem', fontSize: '0.75rem' }}
-                          onClick={() => onReportReview?.(place.id, review.id)}
-                          title="Reportar reseña"
-                        >
-                          ⚑ Reportar
-                        </button>
+                        reportingReviewId === review.id ? (
+                          <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <select
+                              value={reportMotivo}
+                              onChange={(e) => setReportMotivo(e.target.value)}
+                              className="form-input"
+                              style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem', minWidth: '6rem' }}
+                            >
+                              <option value="spam">Spam</option>
+                              <option value="ofensivo">Ofensivo</option>
+                              <option value="falso">Falso</option>
+                              <option value="otro">Otro</option>
+                            </select>
+                            <button
+                              type="button"
+                              className="pill-button pill-button--danger"
+                              style={{ padding: '0.35rem 0.7rem', fontSize: '0.75rem' }}
+                              onClick={() => {
+                                onReportReview?.(place.id, review.id, reportMotivo);
+                                setReportingReviewId(null);
+                                setReportMotivo('spam');
+                              }}
+                            >
+                              Confirmar
+                            </button>
+                            <button
+                              type="button"
+                              className="pill-button pill-button--ghost"
+                              style={{ padding: '0.35rem 0.7rem', fontSize: '0.75rem' }}
+                              onClick={() => { setReportingReviewId(null); setReportMotivo('spam'); }}
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            className="pill-button pill-button--ghost"
+                            style={{ padding: '0.35rem 0.7rem', fontSize: '0.75rem' }}
+                            onClick={() => setReportingReviewId(review.id)}
+                            title="Reportar reseña"
+                          >
+                            ⚑ Reportar
+                          </button>
+                        )
                       )}
                     </div>
                     <div className="review-stars">{ratingIcons(review.puntuacion)}</div>

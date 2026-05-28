@@ -139,10 +139,10 @@ function AppContent() {
     }
   }, [fetchFavoritos]);
 
-  const handleReportReview = useCallback(async (lugarId, resenaId) => {
+  const handleReportReview = useCallback(async (lugarId, resenaId, motivo = 'otro') => {
     if (!isAuthenticated) { requireAuth('detalle'); return; }
     try {
-      await api.post(`/lugares/${lugarId}/resenas/${resenaId}/reportes`, { motivo: 'otro' });
+      await api.post(`/lugares/${lugarId}/resenas/${resenaId}/reportes`, { motivo });
       showToast('Reseña reportada. Gracias por ayudarnos.');
     } catch (err) {
       const msg = err.response?.data?.message || 'Error al reportar';
