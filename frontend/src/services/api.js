@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { cleanTextDeep } from '../utils/text.js';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -18,7 +19,10 @@ api.interceptors.request.use((config) => {
 
 // Handle 401 - redirect to login on token expiration
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    response.data = cleanTextDeep(response.data);
+    return response;
+  },
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');

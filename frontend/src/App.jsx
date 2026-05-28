@@ -4,6 +4,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import api from './services/api.js';
 import { getLugares, getFavoritos, toggleFavorito } from './services/placesService';
 import Toast from './components/Toast';
+import LandingScreen       from './screens/LandingScreen';
 import ExplorerScreen      from './screens/ExplorerScreen';
 import DetailScreen        from './screens/DetailScreen';
 import AddPlaceScreen      from './screens/AddPlaceScreen';
@@ -31,7 +32,7 @@ const parseCategory = (value = 'General') => value || 'General';
 function AppContent() {
   const { user, loading, logout, isAuthenticated } = useAuth();
   const [lugares, setLugares] = useState([]);
-  const [view, setView] = useState('mapa');
+  const [view, setView] = useState('landing');
   const [categoriaSel, setCategoriaSel] = useState('Todos');
   const [busqueda, setBusqueda] = useState("");
   const [userLocation, setUserLocation] = useState(null);
@@ -229,6 +230,11 @@ function AppContent() {
   };
 
   const navigate = (target) => {
+    if (target === 'landing') {
+      setView('landing');
+      return;
+    }
+
     if (target === 'añadir') {
       handleOpenAdd();
       return;
@@ -321,6 +327,15 @@ function AppContent() {
           onClose={() => setToast(null)}
         />
       )}
+      {view === 'landing' && (
+        <LandingScreen
+          places={places}
+          onExplore={goToMap}
+          onPublish={handleOpenAdd}
+          onSelectPlace={handleSelectPlace}
+        />
+      )}
+
       {view === 'mapa' && (
         <ExplorerScreen
           places={places}

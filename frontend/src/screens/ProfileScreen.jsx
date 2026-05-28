@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { LogOut, Sun, Moon, ShieldCheck, CheckCircle, XCircle, AlertTriangle, Bell } from 'lucide-react';
-import PanelNav from '../components/shared/PanelNav';
+import { LogOut, Sun, Moon, ShieldCheck, CheckCircle, XCircle, AlertTriangle, Bell, UserRound, Map } from 'lucide-react';
+import WorkspaceScreen from '../components/shared/WorkspaceScreen';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api.js';
@@ -190,46 +190,57 @@ export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavig
   };
 
   const authContent = (
-    <div style={{ padding: '0 1.2rem 1.5rem' }}>
-      <div className="auth-tabs">
-        <button type="button" className={`auth-tab${tab === 'login' ? ' is-active' : ''}`}
-          onClick={() => { setTab('login'); setError(''); }}>
-          Iniciar sesión
-        </button>
-        <button type="button" className={`auth-tab${tab === 'register' ? ' is-active' : ''}`}
-          onClick={() => { setTab('register'); setError(''); }}>
-          Registrarse
-        </button>
-      </div>
-      <form onSubmit={handleAuth}>
-        {tab === 'register' && (
+    <div className="workspace-grid workspace-grid--auth">
+      <section className="workspace-panel workspace-panel--feature">
+        <p className="eyebrow">Acceso opcional</p>
+        <h2>Explora libremente. Inicia sesión solo para aportar.</h2>
+        <p>
+          El mapa permanece abierto sin registro. La cuenta desbloquea favoritos,
+          reseñas, publicación de lugares y actividad de tus aportes.
+        </p>
+      </section>
+
+      <section className="workspace-panel workspace-panel--form">
+        <div className="auth-tabs">
+          <button type="button" className={`auth-tab${tab === 'login' ? ' is-active' : ''}`}
+            onClick={() => { setTab('login'); setError(''); }}>
+            Iniciar sesión
+          </button>
+          <button type="button" className={`auth-tab${tab === 'register' ? ' is-active' : ''}`}
+            onClick={() => { setTab('register'); setError(''); }}>
+            Registrarse
+          </button>
+        </div>
+        <form onSubmit={handleAuth}>
+          {tab === 'register' && (
+            <div className="form-field">
+              <label>Nombre</label>
+              <input type="text" required value={form.nombre} placeholder="Tu nombre"
+                onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} />
+            </div>
+          )}
           <div className="form-field">
-            <label>Nombre</label>
-            <input type="text" required value={form.nombre} placeholder="Tu nombre"
-              onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} />
+            <label>Email</label>
+            <input type="email" required value={form.email} placeholder="tu@email.com"
+              onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
           </div>
-        )}
-        <div className="form-field">
-          <label>Email</label>
-          <input type="email" required value={form.email} placeholder="tu@email.com"
-            onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
-        </div>
-        <div className="form-field">
-          <label>Contraseña</label>
-          <input type="password" required value={form.password} placeholder="••••••••"
-            onChange={e => setForm(f => ({ ...f, password: e.target.value }))} />
-        </div>
-        {error && <p style={{ fontSize: '0.78rem', color: 'var(--danger)', marginBottom: '0.7rem' }}>{error}</p>}
-        <button type="submit" className="btn btn--primary btn--block" disabled={loading}>
-          {loading ? 'Cargando…' : tab === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
-        </button>
-      </form>
+          <div className="form-field">
+            <label>Contraseña</label>
+            <input type="password" required value={form.password} placeholder="••••••••"
+              onChange={e => setForm(f => ({ ...f, password: e.target.value }))} />
+          </div>
+          {error && <p style={{ fontSize: '0.78rem', color: 'var(--danger)', marginBottom: '0.7rem' }}>{error}</p>}
+          <button type="submit" className="btn btn--primary btn--block" disabled={loading}>
+            {loading ? 'Cargando…' : tab === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
+          </button>
+        </form>
+      </section>
     </div>
   );
 
   const profileContent = !user ? null : (
-    <div style={{ padding: '0 1.2rem 1.5rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.8rem 0 1.2rem' }}>
+    <div className="workspace-grid workspace-grid--profile">
+      <section className="workspace-panel workspace-panel--account">
         <div className="profile-avatar">{initials(user?.nombre)}</div>
         <div>
           <div style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: '1.1rem', color: 'var(--text-1)' }}>
@@ -237,8 +248,9 @@ export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavig
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-2)', marginTop: '0.1rem' }}>{user?.email}</div>
         </div>
-      </div>
-      <div style={{ marginBottom: '1rem' }}>
+      </section>
+
+      <section className="workspace-panel">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
           <Bell size={14} color="var(--amber)" strokeWidth={1.5} />
           <span style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em',
@@ -247,8 +259,9 @@ export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavig
           </span>
         </div>
         <ActivityFeed />
-      </div>
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+      </section>
+
+      <section className="workspace-panel workspace-panel--actions">
         <button type="button" className="btn btn--ghost" onClick={toggleTheme}
           style={{ flex: 1, gap: '0.4rem' }}>
           {isDark ? <Sun size={15} strokeWidth={1.5} /> : <Moon size={15} strokeWidth={1.5} />}
@@ -258,37 +271,34 @@ export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavig
           style={{ flex: 1, gap: '0.4rem' }}>
           <LogOut size={15} strokeWidth={1.5} /> Cerrar sesión
         </button>
-      </div>
+      </section>
+
       {user?.rol === 'admin' && (
-        <ModerationPanel />
+        <section className="workspace-panel workspace-panel--wide">
+          <ModerationPanel />
+        </section>
       )}
     </div>
   );
 
   return (
-    <div className="app-container">
-      <div className="map-layer" style={{ background: 'var(--bg-2)' }} />
-
-      {/* MOBILE */}
-      <div className="bottom-panel is-expanded" style={{ transform: 'translateY(0)', maxHeight: '100vh' }}>
-        <PanelNav activeView="perfil" onNavigate={onNavigate} notifCount={notifCount} />
-        <div className="panel-content" style={{ overflowY: 'auto' }}>
-          {isAuthenticated ? profileContent : authContent}
-        </div>
-      </div>
-
-      {/* DESKTOP */}
-      <div className="desktop-panel">
-        <div className="panel-header">
-          <div className="panel-brand">
-            Perfil<br /><small>{isAuthenticated ? user?.nombre : 'no autenticado'}</small>
-          </div>
-        </div>
-        <PanelNav activeView="perfil" onNavigate={onNavigate} notifCount={notifCount} />
-        <div className="panel-content" style={{ overflowY: 'auto' }}>
-          {isAuthenticated ? profileContent : authContent}
-        </div>
-      </div>
-    </div>
+    <WorkspaceScreen
+      activeView="perfil"
+      eyebrow={isAuthenticated ? 'Cuenta' : 'Acceso'}
+      title={isAuthenticated ? user?.nombre : 'Explora sin registro'}
+      subtitle={isAuthenticated
+        ? 'Administra tu actividad, tema y moderación desde un espacio más amplio.'
+        : 'Inicia sesión solo cuando quieras publicar, guardar o reseñar.'}
+      icon={UserRound}
+      onNavigate={onNavigate}
+      notifCount={notifCount}
+      actions={(
+        <button type="button" className="btn btn--primary" onClick={() => onNavigate('mapa')}>
+          <Map size={15} strokeWidth={1.8} /> Explorar mapa
+        </button>
+      )}
+    >
+      {isAuthenticated ? profileContent : authContent}
+    </WorkspaceScreen>
   );
 }

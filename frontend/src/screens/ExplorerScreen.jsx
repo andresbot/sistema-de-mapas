@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlusCircle, Sun, Moon } from 'lucide-react';
+import { Compass, Home, PlusCircle, Sun, Moon } from 'lucide-react';
 import MapContainer from '../components/MapContainer';
 import SearchBar from '../components/shared/SearchBar';
 import CategoryChips from '../components/shared/CategoryChips';
@@ -40,6 +40,7 @@ export default function ExplorerScreen({
         onChange={setSearch}
         userInitials={userInits}
         onAvatarClick={() => onNavigate('perfil')}
+        onHomeClick={() => onNavigate('landing')}
       />
 
       {/* CHIPS (mobile only via CSS) */}
@@ -74,10 +75,13 @@ export default function ExplorerScreen({
       {/* DESKTOP PANEL */}
       <div className="desktop-panel">
         <div className="panel-header">
-          <div className="panel-brand">
+          <button type="button" className="panel-brand panel-brand--button" onClick={() => onNavigate('landing')}>
             Mapa<br /><small>de Reseñas</small>
-          </div>
+          </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button type="button" className="btn btn--ghost btn--sm" onClick={() => onNavigate('landing')}>
+              <Home size={14} strokeWidth={1.8} /> Inicio
+            </button>
             <button type="button" className="btn btn--icon" onClick={toggleTheme}
               title={isDark ? 'Modo claro' : 'Modo oscuro'}>
               {isDark ? <Sun size={16} strokeWidth={1.5} /> : <Moon size={16} strokeWidth={1.5} />}
@@ -92,6 +96,15 @@ export default function ExplorerScreen({
         </div>
 
         <PanelNav activeView="mapa" onNavigate={onNavigate} notifCount={notifCount} />
+
+        <section className="panel-intro">
+          <span className="panel-intro__icon"><Compass size={15} strokeWidth={1.7} /></span>
+          <div>
+            <p className="eyebrow">Explorar</p>
+            <h2>{filteredPlaces.length} lugar{filteredPlaces.length !== 1 ? 'es' : ''} encontrado{filteredPlaces.length !== 1 ? 's' : ''}</h2>
+            <p>Busca por nombre, categoría o dirección y abre el detalle para reseñar, guardar o compartir.</p>
+          </div>
+        </section>
 
         <div style={{ padding: '0.6rem 1rem 0' }}>
           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>

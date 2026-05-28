@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   ArrowLeft, Bookmark, BookmarkCheck, Share2, Flag,
   Star, MapPin, Clock, Phone, Globe, MessageSquare,
-  User, Trash2, X
+  User, Trash2, X, MapPinned, Home
 } from 'lucide-react';
 import PanelNav from '../components/shared/PanelNav';
 import PlaceCard from '../components/shared/PlaceCard';
@@ -248,8 +248,13 @@ export default function DetailScreen({
 
       {/* MOBILE */}
       <div className="bottom-panel is-expanded" style={{ transform: 'translateY(0)', maxHeight: '92vh' }}>
-        <div className="panel-back" onClick={onBack}>
-          <ArrowLeft size={16} strokeWidth={1.5} /> Volver al mapa
+        <div className="panel-back panel-back--split">
+          <button type="button" className="panel-back__action" onClick={onBack}>
+            <ArrowLeft size={16} strokeWidth={1.5} /> Volver al mapa
+          </button>
+          <button type="button" className="panel-home-link" onClick={() => onNavigate('landing')}>
+            <Home size={13} strokeWidth={1.8} /> Inicio
+          </button>
         </div>
         <div className="panel-content" style={{ overflowY: 'auto' }}>
           {panelContent}
@@ -258,10 +263,23 @@ export default function DetailScreen({
 
       {/* DESKTOP */}
       <div className="desktop-panel">
-        <div className="panel-back" onClick={onBack}>
-          <ArrowLeft size={16} strokeWidth={1.5} /> Volver
+        <div className="panel-back panel-back--split">
+          <button type="button" className="panel-back__action" onClick={onBack}>
+            <ArrowLeft size={16} strokeWidth={1.5} /> Volver
+          </button>
+          <button type="button" className="panel-home-link" onClick={() => onNavigate('landing')}>
+            <Home size={13} strokeWidth={1.8} /> Inicio
+          </button>
         </div>
         <PanelNav activeView="detalle" onNavigate={onNavigate} notifCount={notifCount} />
+        <section className="panel-intro">
+          <span className="panel-intro__icon"><MapPinned size={15} strokeWidth={1.7} /></span>
+          <div>
+            <p className="eyebrow">Detalle</p>
+            <h2>{place.nombre}</h2>
+            <p>Consulta datos útiles, reseñas y acciones rápidas del lugar seleccionado.</p>
+          </div>
+        </section>
         <div className="panel-content" style={{ overflowY: 'auto' }}>
           {panelContent}
         </div>

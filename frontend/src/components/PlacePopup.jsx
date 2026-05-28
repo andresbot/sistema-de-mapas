@@ -1,4 +1,5 @@
 import React from 'react';
+import { Clock, MapPin, Phone, Search, Star, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 /**
@@ -9,8 +10,11 @@ import { useAuth } from '../context/AuthContext';
 const PlacePopup = ({ lugar, onOpenDetail, onDelete }) => {
   const { isAuthenticated } = useAuth();
 
-  const icon = lugar.categoriaIcono || '📍';
   const color = lugar.categoriaColor || '#007AFF';
+  const categoryStyle = {
+    background: color.startsWith('#') ? `${color}22` : 'var(--amber-dim)',
+    color,
+  };
   const stars = Math.round(lugar.puntuacionPromedio || 0);
 
   return (
@@ -19,9 +23,14 @@ const PlacePopup = ({ lugar, onOpenDetail, onDelete }) => {
       {/* Cabecera: badge de categoría */}
       <span
         className="category-tag"
-        style={{ background: color + '22', color }}
+        style={categoryStyle}
       >
-        {icon} {lugar.categoria}
+        {lugar.categoriaIcono ? (
+          <span className="category-tag__icon" aria-hidden="true">{lugar.categoriaIcono}</span>
+        ) : (
+          <MapPin size={13} strokeWidth={2} aria-hidden="true" />
+        )}
+        {lugar.categoria}
       </span>
 
       {/* Nombre */}
@@ -35,9 +44,9 @@ const PlacePopup = ({ lugar, onOpenDetail, onDelete }) => {
       {/* Detalles */}
       {(lugar.direccion || lugar.horario || lugar.telefono) && (
         <ul className="popup-details">
-          {lugar.direccion && <li><span className="detail-icon">📍</span>{lugar.direccion}</li>}
-          {lugar.horario   && <li><span className="detail-icon">🕐</span>{lugar.horario}</li>}
-          {lugar.telefono  && <li><span className="detail-icon">📞</span>{lugar.telefono}</li>}
+          {lugar.direccion && <li><MapPin size={14} strokeWidth={2} /><span>{lugar.direccion}</span></li>}
+          {lugar.horario   && <li><Clock size={14} strokeWidth={2} /><span>{lugar.horario}</span></li>}
+          {lugar.telefono  && <li><Phone size={14} strokeWidth={2} /><span>{lugar.telefono}</span></li>}
         </ul>
       )}
 
@@ -46,7 +55,13 @@ const PlacePopup = ({ lugar, onOpenDetail, onDelete }) => {
         <div className="popup-rating">
           <span className="popup-stars">
             {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} style={{ color: i < stars ? '#FFD60A' : '#ccc' }}>★</span>
+              <Star
+                key={i}
+                size={13}
+                strokeWidth={2}
+                fill={i < stars ? 'currentColor' : 'none'}
+                className={i < stars ? 'is-filled' : ''}
+              />
             ))}
           </span>
           <span className="popup-rating-text">
@@ -64,7 +79,7 @@ const PlacePopup = ({ lugar, onOpenDetail, onDelete }) => {
           onClick={() => onOpenDetail?.(lugar)}
           title="Ver detalle"
         >
-          🔎 Ver detalle
+          <Search size={14} strokeWidth={2} /> Ver detalle
         </button>
 
         {/* Eliminar — solo usuarios autenticados */}
@@ -75,7 +90,7 @@ const PlacePopup = ({ lugar, onOpenDetail, onDelete }) => {
             onClick={() => onDelete(lugar.id)}
             title="Eliminar lugar"
           >
-            🗑️ Eliminar
+            <Trash2 size={14} strokeWidth={2} /> Eliminar
           </button>
         )}
       </div>

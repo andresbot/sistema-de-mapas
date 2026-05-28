@@ -3,10 +3,14 @@
   --bg:           #0C0C0E;
   --bg-2:         #111118;
   --bg-3:         #16161F;
+  --bg-map-dim:   rgba(5,5,8,0.46);
   --glass:        rgba(12,12,14,0.88);
   --glass-strong: rgba(10,10,16,0.96);
+  --glass-soft:   rgba(18,18,26,0.76);
 
   --amber:        #F59E0B;
+  --rose:         #E11D48;
+  --teal:         #2DD4BF;
   --amber-dim:    rgba(245,158,11,0.18);
   --amber-glow:   rgba(245,158,11,0.10);
   --amber-border: rgba(245,158,11,0.22);
@@ -36,9 +40,13 @@
   --bg:           #F5F0E8;
   --bg-2:         #FFFFFF;
   --bg-3:         #EDE8DC;
+  --bg-map-dim:   rgba(245,240,232,0.24);
   --glass:        rgba(245,240,232,0.88);
   --glass-strong: rgba(245,240,232,0.96);
+  --glass-soft:   rgba(255,255,255,0.78);
   --amber:        #B45309;
+  --rose:         #BE123C;
+  --teal:         #0F766E;
   --amber-dim:    rgba(180,83,9,0.15);
   --amber-glow:   rgba(180,83,9,0.10);
   --amber-border: rgba(180,83,9,0.28);

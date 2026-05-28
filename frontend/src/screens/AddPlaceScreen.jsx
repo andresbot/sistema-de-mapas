@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Clock3, MapPin, Navigation, Phone, Send } from 'lucide-react';
+import { ArrowLeft, Clock3, Home, MapPin, Navigation, Phone, Send, SquarePen } from 'lucide-react';
 import MapContainer from '../components/MapContainer';
 import PanelNav from '../components/shared/PanelNav';
 
@@ -128,8 +128,13 @@ export default function AddPlaceScreen({
         <div className="panel-handle-wrap" onClick={() => setPanelExpanded(v => !v)}>
           <div className="panel-handle" />
         </div>
-        <div className="panel-back" onClick={onBack}>
-          <ArrowLeft size={16} strokeWidth={1.5} /> Cancelar
+        <div className="panel-back panel-back--split">
+          <button type="button" className="panel-back__action" onClick={onBack}>
+            <ArrowLeft size={16} strokeWidth={1.5} /> Cancelar
+          </button>
+          <button type="button" className="panel-home-link" onClick={() => onNavigate('landing')}>
+            <Home size={13} strokeWidth={1.8} /> Inicio
+          </button>
         </div>
         <div className="panel-content" style={{ overflowY: 'auto' }}>
           {formContent}
@@ -138,10 +143,23 @@ export default function AddPlaceScreen({
 
       {/* DESKTOP */}
       <div className="desktop-panel">
-        <div className="panel-back" onClick={onBack}>
-          <ArrowLeft size={16} strokeWidth={1.5} /> Cancelar
+        <div className="panel-back panel-back--split">
+          <button type="button" className="panel-back__action" onClick={onBack}>
+            <ArrowLeft size={16} strokeWidth={1.5} /> Cancelar
+          </button>
+          <button type="button" className="panel-home-link" onClick={() => onNavigate('landing')}>
+            <Home size={13} strokeWidth={1.8} /> Inicio
+          </button>
         </div>
         <PanelNav activeView="añadir" onNavigate={onNavigate} notifCount={notifCount} />
+        <section className="panel-intro">
+          <span className="panel-intro__icon"><SquarePen size={15} strokeWidth={1.7} /></span>
+          <div>
+            <p className="eyebrow">Publicar</p>
+            <h2>Nuevo lugar</h2>
+            <p>Marca la ubicación, agrega los datos básicos y deja información útil para quien lo visite.</p>
+          </div>
+        </section>
         <div className="panel-content" style={{ overflowY: 'auto' }}>
           {formContent}
         </div>

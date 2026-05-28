@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import MapGL, { Marker, Popup } from 'react-map-gl/mapbox';
+import { MapPin } from 'lucide-react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import PlacePopup from './PlacePopup';
 
@@ -81,7 +82,7 @@ const MapView = ({ lugares = [], userLocation, onMapClick, onOpenDetail, onDelet
                 boxShadow: '0 4px 16px rgba(245,158,11,0.5), 0 0 0 4px rgba(245,158,11,0.15)',
                 animation: 'pinDrop 0.3s ease-out',
               }}>
-                <span style={{ transform: 'rotate(45deg)', fontSize: '1rem', display: 'block' }}>📍</span>
+                <MapPin size={16} strokeWidth={2.4} style={{ transform: 'rotate(45deg)' }} />
               </div>
               <div style={{
                 width: 0, height: 0,
@@ -108,7 +109,11 @@ const MapView = ({ lugares = [], userLocation, onMapClick, onOpenDetail, onDelet
           >
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}>
               <div className="custom-marker" style={{ background: lugar.categoriaColor || 'var(--amber)' }}>
-                <span className="custom-marker-emoji">{lugar.categoriaIcono || '📍'}</span>
+                {lugar.categoriaIcono ? (
+                  <span className="custom-marker-emoji">{lugar.categoriaIcono}</span>
+                ) : (
+                  <MapPin className="custom-marker-fallback" size={16} strokeWidth={2.4} />
+                )}
               </div>
               <div className="custom-marker-tip" style={{ borderTopColor: lugar.categoriaColor || '#007AFF' }}></div>
             </div>
