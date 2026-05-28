@@ -14,14 +14,15 @@ import {
   FALLBACK_CENTER,
 } from './data/demoContent';
 
-/* eslint-disable react-hooks/set-state-in-effect */
-
 // Nota: el interceptor JWT ya vive en services/api.js — no se duplica aquí.
 
 const initialForm = {
   nombre: '',
   categoria: 'Restaurante',
   descripcion: '',
+  direccion: '',
+  horario: '',
+  telefono: '',
   review: '',
 };
 
@@ -50,14 +51,14 @@ function AppContent() {
     setToast({ message, type });
   }, []);
 
-  const fetchLugares = async () => {
+  const fetchLugares = useCallback(async () => {
     try {
       const data = await getLugares();
       setLugares(data);
     } catch (err) {
       console.error('❌ Error cargando lugares:', err);
     }
-  };
+  }, []);
 
   const fetchFavoritos = useCallback(async () => {
     if (!isAuthenticated) { setSavedPlaces([]); setFavoritoIds(new Set()); return; }
@@ -135,9 +136,15 @@ function AppContent() {
 
   // --- CARGA DE DATOS Y GPS ---
   useEffect(() => {
-    fetchLugares();
-    fetchFavoritos();
-    fetchNotificaciones();
+    const loadInitialData = async () => {
+      await Promise.all([
+        fetchLugares(),
+        fetchFavoritos(),
+        fetchNotificaciones(),
+      ]);
+    };
+
+    void loadInitialData();
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (p) => setUserLocation({ lat: p.coords.latitude, lng: p.coords.longitude }),
@@ -145,7 +152,17 @@ function AppContent() {
         { enableHighAccuracy: true }
       );
     }
-  }, [fetchFavoritos, fetchNotificaciones]);
+  }, [fetchLugares, fetchFavoritos, fetchNotificaciones]);
+
+  const requireAuth = useCallback((nextView, coords) => {
+    if (isAuthenticated) {
+      return true;
+    }
+
+    setPendingAfterAuth({ view: nextView, coords });
+    setView('perfil');
+    return false;
+  }, [isAuthenticated]);
 
   const handleReportReview = useCallback(async (lugarId, resenaId, motivo = 'otro') => {
     if (!isAuthenticated) { requireAuth('detalle'); return; }
@@ -156,7 +173,7 @@ function AppContent() {
       const msg = err.response?.data?.message || 'Error al reportar';
       showToast(msg, 'error');
     }
-  }, [isAuthenticated, showToast]);
+  }, [isAuthenticated, requireAuth, showToast]);
 
   if (loading) {
     return (
@@ -184,16 +201,6 @@ function AppContent() {
     logout();
     setView('perfil');
     setPendingAfterAuth(null);
-  };
-
-  const requireAuth = (nextView, coords) => {
-    if (isAuthenticated) {
-      return true;
-    }
-
-    setPendingAfterAuth({ view: nextView, coords });
-    setView('perfil');
-    return false;
   };
 
   const handleMapClick = (coords) => {

@@ -11,7 +11,7 @@ const NAV_ITEMS = [
 export default function PanelNav({ activeView, onNavigate, notifCount = 0 }) {
   return (
     <div className="panel-nav">
-      {NAV_ITEMS.map(({ id, icon: Icon, label }) => (
+      {NAV_ITEMS.map(({ id, icon, label }) => (
         <button
           key={id}
           type="button"
@@ -19,7 +19,7 @@ export default function PanelNav({ activeView, onNavigate, notifCount = 0 }) {
           onClick={() => onNavigate(id)}
         >
           <span style={{ position: 'relative', display: 'inline-flex' }}>
-            <Icon size={18} strokeWidth={activeView === id ? 2 : 1.5} />
+            {React.createElement(icon, { size: 18, strokeWidth: activeView === id ? 2 : 1.5 })}
             {id === 'perfil' && notifCount > 0 && (
               <span style={{
                 position: 'absolute', top: -4, right: -5,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, MapPin, Send, Navigation } from 'lucide-react';
+import { ArrowLeft, Clock3, MapPin, Navigation, Phone, Send } from 'lucide-react';
 import MapContainer from '../components/MapContainer';
 import PanelNav from '../components/shared/PanelNav';
 
@@ -7,7 +7,7 @@ const CATEGORIES = ['Restaurante', 'Parque', 'Cultura', 'Tienda', 'Servicio', 'T
 
 export default function AddPlaceScreen({
   values, setValues, coords, onCoordsChange, onSubmit,
-  onBack, onUseCurrentLocation, userLocation, isAuthenticated, onNavigate, notifCount = 0,
+  onBack, onUseCurrentLocation, userLocation, onNavigate, notifCount = 0,
 }) {
   const [panelExpanded, setPanelExpanded] = React.useState(false);
   const [pinCoords, setPinCoords] = React.useState(null);
@@ -68,6 +68,37 @@ export default function AddPlaceScreen({
           <label>Descripción</label>
           <textarea rows={3} value={values.descripcion} placeholder="Cuéntanos sobre este lugar..."
             onChange={e => setValues(v => ({ ...v, descripcion: e.target.value }))} />
+        </div>
+
+        <div className="form-section-title">
+          <MapPin size={13} strokeWidth={1.5} /> Datos opcionales
+        </div>
+
+        <div className="form-field">
+          <label>Dirección</label>
+          <div className="input-with-icon">
+            <MapPin size={14} strokeWidth={1.5} />
+            <input type="text" value={values.direccion || ''} placeholder="Av. Libertador 1234, Barrio Norte"
+              onChange={e => setValues(v => ({ ...v, direccion: e.target.value }))} />
+          </div>
+        </div>
+
+        <div className="form-field">
+          <label>Horario</label>
+          <div className="input-with-icon">
+            <Clock3 size={14} strokeWidth={1.5} />
+            <input type="text" value={values.horario || ''} placeholder="08:00 - 20:00"
+              onChange={e => setValues(v => ({ ...v, horario: e.target.value }))} />
+          </div>
+        </div>
+
+        <div className="form-field">
+          <label>Teléfono</label>
+          <div className="input-with-icon">
+            <Phone size={14} strokeWidth={1.5} />
+            <input type="tel" value={values.telefono || ''} placeholder="+57 300 123 4567"
+              onChange={e => setValues(v => ({ ...v, telefono: e.target.value }))} />
+          </div>
         </div>
 
         <button type="submit" className="btn btn--primary btn--block"

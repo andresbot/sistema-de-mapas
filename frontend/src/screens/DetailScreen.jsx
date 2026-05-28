@@ -31,7 +31,7 @@ function StarRow({ value, onChange, readonly = false }) {
 
 export default function DetailScreen({
   place, onBack, onNavigate, onSelectPlace, relatedPlaces = [],
-  onOpenAdd, onDelete, onAddReview, onDeleteReview, currentUserId,
+  onDelete, onAddReview, onDeleteReview, currentUserId,
   isFavorited = false, onToggleFavorito, onOpenPublicProfile,
   onSharePlace, onReportReview, notifCount = 0,
 }) {

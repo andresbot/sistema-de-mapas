@@ -56,9 +56,24 @@ const CATEGORIAS_DEFAULT = {
   general:     { icono: '📍', color: '#007AFF' },
 };
 
+const optionalText = (value) => {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed || null;
+};
+
 export const crearLugar = async (req, res) => {
   try {
-    const { nombre, descripcion, latitud, longitud, categoria = 'General' } = req.body;
+    const {
+      nombre,
+      descripcion,
+      latitud,
+      longitud,
+      categoria = 'General',
+      direccion,
+      horario,
+      telefono,
+    } = req.body;
     const creadorId = req.user.id;
 
     if (!nombre || latitud === undefined || longitud === undefined) {
@@ -78,8 +93,11 @@ export const crearLugar = async (req, res) => {
 
     const lugar = await prisma.lugar.create({
       data: {
-        nombre,
-        descripcion: descripcion || null,
+        nombre: nombre.trim(),
+        descripcion: optionalText(descripcion),
+        direccion: optionalText(direccion),
+        horario: optionalText(horario),
+        telefono: optionalText(telefono),
         latitud: parseFloat(latitud),
         longitud: parseFloat(longitud),
         categoriaId: cat.id,
@@ -96,6 +114,9 @@ export const crearLugar = async (req, res) => {
         descripcion: lugar.descripcion,
         latitud: lugar.latitud,
         longitud: lugar.longitud,
+        direccion: lugar.direccion,
+        horario: lugar.horario,
+        telefono: lugar.telefono,
         categoria: lugar.categoria.nombre,
         categoriaIcono: lugar.categoria.icono,
         categoriaColor: lugar.categoria.color,

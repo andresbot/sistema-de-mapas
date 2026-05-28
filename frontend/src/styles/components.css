@@ -55,6 +55,32 @@
 
 /* ── FORMS ── */
 .form-field { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.9rem; }
+.input-with-icon {
+  display: flex; align-items: center; gap: 0.55rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--amber-border);
+  border-radius: var(--r);
+  padding: 0 0.75rem;
+  transition: border-color var(--ease), box-shadow var(--ease);
+}
+.input-with-icon:focus-within {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-glow);
+}
+.input-with-icon svg {
+  color: var(--amber);
+  flex: 0 0 auto;
+}
+.input-with-icon input {
+  border: 0;
+  box-shadow: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+.input-with-icon input:focus {
+  border: 0;
+  box-shadow: none;
+}
 .form-section-title {
   font-family: var(--font-display); font-style: italic; font-size: 0.9rem;
   color: var(--text-1); margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.4rem;

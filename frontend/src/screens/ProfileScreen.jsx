@@ -113,7 +113,7 @@ function ModerationPanel() {
   );
 }
 
-function ActivityFeed({ userId }) {
+function ActivityFeed() {
   const [items, setItems] = React.useState([]);
   const [loaded, setLoaded] = React.useState(false);
 
@@ -143,7 +143,7 @@ function ActivityFeed({ userId }) {
           <span style={{ color: 'var(--amber)' }}>{n.lugarNombre}</span>
           {n.puntuacion && ` · ${'★'.repeat(n.puntuacion)}`}
           {n.comentario && (
-            <span style={{ display: 'block', color: 'var(--text-3)', fontSize: '0.72rem', marginTop: '0.1rem',
+            <span style={{ color: 'var(--text-3)', fontSize: '0.72rem', marginTop: '0.1rem',
               overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>
               "{n.comentario}"
             </span>
@@ -246,7 +246,7 @@ export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavig
             Actividad reciente
           </span>
         </div>
-        <ActivityFeed userId={user?.id} />
+        <ActivityFeed />
       </div>
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
         <button type="button" className="btn btn--ghost" onClick={toggleTheme}

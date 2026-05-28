@@ -12,9 +12,9 @@ function initials(name = '') {
 }
 
 export default function ExplorerScreen({
-  places, filteredPlaces, search, setSearch, category, setCategory,
+  filteredPlaces, search, setSearch, category, setCategory,
   onSelectPlace, onOpenAdd, onNavigate, onMapClick,
-  userLocation, isAuthenticated, user, onLogout, notifCount = 0,
+  userLocation, user, notifCount = 0,
 }) {
   const [panelOpen, setPanelOpen] = useState(false);
   const { isDark, toggleTheme } = useTheme();
