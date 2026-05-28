@@ -76,7 +76,7 @@ const MapView = ({ lugares = [], userLocation, onMapClick, onOpenDetail, onDelet
             }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}>
-              <div className="custom-marker" style={{ background: lugar.categoriaColor || '#007AFF' }}>
+              <div className="custom-marker" style={{ background: lugar.categoriaColor || 'var(--amber)' }}>
                 <span className="custom-marker-emoji">{lugar.categoriaIcono || '📍'}</span>
               </div>
               <div className="custom-marker-tip" style={{ borderTopColor: lugar.categoriaColor || '#007AFF' }}></div>

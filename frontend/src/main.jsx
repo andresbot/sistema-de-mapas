@@ -2,14 +2,10 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 
-// Design system (order matters)
-import './styles/base.css'
-import './styles/layout.css'
+import './styles/tokens.css'
+import './styles/global.css'
+import './styles/panel.css'
 import './styles/components.css'
-import './styles/screens.css'
-import './styles/panels.css'
-import './styles/auth-profile.css'
-import './styles/nav-responsive.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
