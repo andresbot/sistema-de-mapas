@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { LogOut, Sun, Moon, ShieldCheck, CheckCircle, XCircle, AlertTriangle, Bell, UserRound, Map } from 'lucide-react';
+import {
+  LogOut, Sun, Moon, ShieldCheck, CheckCircle, XCircle, AlertTriangle,
+  Bell, UserRound, Map, Mail, KeyRound, ArrowLeft
+} from 'lucide-react';
 import WorkspaceScreen from '../components/shared/WorkspaceScreen';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import { authService } from '../services/authService';
 import api from '../services/api.js';
 
 function ModerationPanel() {
@@ -161,13 +165,31 @@ function initials(name = '') {
   return name.split(' ').filter(Boolean).slice(0, 2).map(n => n[0]).join('').toUpperCase() || '?';
 }
 
-export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavigate, onAuthSuccess, notifCount = 0 }) {
+export default function ProfileScreen({
+  user,
+  isAuthenticated,
+  onLogout,
+  onNavigate,
+  onAuthSuccess,
+  mode = 'perfil',
+  resetToken = '',
+  onResetComplete,
+  notifCount = 0,
+}) {
   const { isDark, toggleTheme } = useTheme();
   const { login, register } = useAuth();
   const [tab, setTab] = useState('login');
   const [form, setForm] = useState({ nombre: '', email: '', password: '' });
+  const [recoveryEmail, setRecoveryEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [resetCompleted, setResetCompleted] = useState(false);
+
+  const isForgotPassword = mode === 'forgotPassword';
+  const isResetPassword = mode === 'resetPassword';
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -188,6 +210,159 @@ export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavig
       setLoading(false);
     }
   };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      const response = await authService.requestPasswordReset(recoveryEmail);
+      setSuccessMessage(response.message || 'Revisa tu correo para continuar.');
+    } catch (err) {
+      setError(err.response?.data?.message || 'No se pudo enviar el correo de recuperación');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccessMessage('');
+
+    if (newPassword !== confirmPassword) {
+      setLoading(false);
+      setError('Las contraseñas no coinciden');
+      return;
+    }
+
+    try {
+      const response = await authService.resetPassword({ token: resetToken, password: newPassword });
+      setSuccessMessage(response.message || 'Contraseña actualizada correctamente');
+      setNewPassword('');
+      setConfirmPassword('');
+      setResetCompleted(true);
+    } catch (err) {
+      setError(err.response?.data?.message || 'No se pudo actualizar la contraseña');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const recoveryContent = (
+    <div className="workspace-grid workspace-grid--auth">
+      <section className="workspace-panel workspace-panel--feature">
+        <p className="eyebrow">Recuperación</p>
+        <h2>Te enviamos un enlace seguro para volver a entrar.</h2>
+        <p>
+          El enlace vence en el tiempo configurado por el servidor y solo puede usarse una vez.
+        </p>
+      </section>
+
+      <section className="workspace-panel workspace-panel--form">
+        <form onSubmit={handleForgotPassword}>
+          <div className="form-section-title">
+            <Mail size={14} strokeWidth={1.6} /> Correo registrado
+          </div>
+          <div className="form-field">
+            <label>Email</label>
+            <input
+              type="email"
+              required
+              value={recoveryEmail}
+              placeholder="tu@email.com"
+              onChange={e => setRecoveryEmail(e.target.value)}
+            />
+          </div>
+          {successMessage && <p className="auth-message auth-message--success">{successMessage}</p>}
+          {error && <p className="auth-message auth-message--error">{error}</p>}
+          <button type="submit" className="btn btn--primary btn--block" disabled={loading}>
+            {loading ? 'Enviando…' : 'Enviar enlace'}
+          </button>
+          <button
+            type="button"
+            className="btn btn--ghost btn--block auth-secondary-action"
+            onClick={() => onNavigate('perfil')}
+          >
+            <ArrowLeft size={14} strokeWidth={1.7} /> Volver al login
+          </button>
+        </form>
+      </section>
+    </div>
+  );
+
+  const resetContent = (
+    <div className="workspace-grid workspace-grid--auth">
+      <section className="workspace-panel workspace-panel--feature">
+        <p className="eyebrow">Nueva contraseña</p>
+        <h2>Crea una contraseña nueva para tu cuenta.</h2>
+        <p>
+          Después del cambio, el enlace quedará invalidado y podrás iniciar sesión con la nueva contraseña.
+        </p>
+      </section>
+
+      <section className="workspace-panel workspace-panel--form">
+        {!resetToken ? (
+          <div className="empty-state" style={{ padding: '1rem 0' }}>
+            <KeyRound size={32} strokeWidth={1.2} color="var(--amber)" />
+            <h3>Enlace no válido</h3>
+            <p>Solicita un nuevo correo de recuperación para continuar.</p>
+            <button type="button" className="btn btn--primary" onClick={() => onNavigate('forgotPassword')}>
+              Solicitar enlace
+            </button>
+          </div>
+        ) : resetCompleted ? (
+          <div className="empty-state" style={{ padding: '1rem 0' }}>
+            <CheckCircle size={34} strokeWidth={1.4} color="var(--success)" />
+            <h3>Contraseña actualizada</h3>
+            <p>{successMessage}</p>
+            <button type="button" className="btn btn--primary" onClick={onResetComplete}>
+              Iniciar sesión
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleResetPassword}>
+            <div className="form-section-title">
+              <KeyRound size={14} strokeWidth={1.6} /> Restablecer acceso
+            </div>
+            <div className="form-field">
+              <label>Nueva contraseña</label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={newPassword}
+                placeholder="Mínimo 6 caracteres"
+                onChange={e => setNewPassword(e.target.value)}
+              />
+            </div>
+            <div className="form-field">
+              <label>Confirmar contraseña</label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={confirmPassword}
+                placeholder="Repite la contraseña"
+                onChange={e => setConfirmPassword(e.target.value)}
+              />
+            </div>
+            {error && <p className="auth-message auth-message--error">{error}</p>}
+            <button
+              type="submit"
+              className="btn btn--primary btn--block"
+              disabled={loading || newPassword.length < 6 || confirmPassword.length < 6}
+            >
+              {loading ? 'Actualizando…' : 'Cambiar contraseña'}
+            </button>
+          </form>
+        )}
+      </section>
+    </div>
+  );
 
   const authContent = (
     <div className="workspace-grid workspace-grid--auth">
@@ -233,6 +408,20 @@ export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavig
           <button type="submit" className="btn btn--primary btn--block" disabled={loading}>
             {loading ? 'Cargando…' : tab === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
           </button>
+          {tab === 'login' && (
+            <button
+              type="button"
+              className="auth-link-button"
+              onClick={() => {
+                setError('');
+                setSuccessMessage('');
+                setRecoveryEmail(form.email);
+                onNavigate('forgotPassword');
+              }}
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          )}
         </form>
       </section>
     </div>
@@ -281,14 +470,38 @@ export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavig
     </div>
   );
 
+  const hero = isResetPassword
+    ? {
+        eyebrow: 'Recuperar acceso',
+        title: 'Crea una nueva contraseña',
+        subtitle: 'Usa el enlace enviado a tu correo para restablecer tu cuenta.',
+      }
+    : isForgotPassword
+      ? {
+          eyebrow: 'Recuperar acceso',
+          title: 'Recibe un enlace por correo',
+          subtitle: 'Ingresa tu email y te enviaremos instrucciones si existe una cuenta registrada.',
+        }
+      : {
+          eyebrow: isAuthenticated ? 'Cuenta' : 'Acceso',
+          title: isAuthenticated ? user?.nombre : 'Explora sin registro',
+          subtitle: isAuthenticated
+            ? 'Administra tu actividad, tema y moderación desde un espacio más amplio.'
+            : 'Inicia sesión solo cuando quieras publicar, guardar o reseñar.',
+        };
+
+  const content = isResetPassword
+    ? resetContent
+    : isForgotPassword
+      ? recoveryContent
+      : isAuthenticated ? profileContent : authContent;
+
   return (
     <WorkspaceScreen
       activeView="perfil"
-      eyebrow={isAuthenticated ? 'Cuenta' : 'Acceso'}
-      title={isAuthenticated ? user?.nombre : 'Explora sin registro'}
-      subtitle={isAuthenticated
-        ? 'Administra tu actividad, tema y moderación desde un espacio más amplio.'
-        : 'Inicia sesión solo cuando quieras publicar, guardar o reseñar.'}
+      eyebrow={hero.eyebrow}
+      title={hero.title}
+      subtitle={hero.subtitle}
       icon={UserRound}
       onNavigate={onNavigate}
       notifCount={notifCount}
@@ -298,7 +511,7 @@ export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavig
         </button>
       )}
     >
-      {isAuthenticated ? profileContent : authContent}
+      {content}
     </WorkspaceScreen>
   );
 }

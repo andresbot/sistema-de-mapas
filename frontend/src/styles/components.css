@@ -161,6 +161,38 @@
   transition: all var(--ease);
 }
 .auth-tab.is-active { color: var(--amber); border-bottom: 2px solid var(--amber); }
+.auth-link-button {
+  display: block;
+  width: fit-content;
+  margin: 0.75rem auto 0;
+  color: var(--amber);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+.auth-link-button:hover {
+  text-decoration: underline;
+}
+.auth-secondary-action {
+  margin-top: 0.65rem;
+}
+.auth-message {
+  margin: 0 0 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--r);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+.auth-message--success {
+  color: var(--success);
+  background: rgba(16,185,129,0.1);
+  border: 1px solid rgba(16,185,129,0.22);
+}
+.auth-message--error {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border: 1px solid rgba(239,68,68,0.22);
+}
 
 /* MAP POPUP */
 .mapbox-popup-override .mapboxgl-popup-content {

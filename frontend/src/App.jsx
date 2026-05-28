@@ -29,10 +29,19 @@ const initialForm = {
 
 const parseCategory = (value = 'General') => value || 'General';
 
+function getResetTokenFromUrl() {
+  if (typeof window === 'undefined') return '';
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token') || '';
+  return window.location.pathname.includes('reset-password') ? token : '';
+}
+
 function AppContent() {
   const { user, loading, logout, isAuthenticated } = useAuth();
+  const initialResetToken = getResetTokenFromUrl();
   const [lugares, setLugares] = useState([]);
-  const [view, setView] = useState('landing');
+  const [view, setView] = useState(initialResetToken ? 'resetPassword' : 'landing');
+  const [resetToken, setResetToken] = useState(initialResetToken);
   const [categoriaSel, setCategoriaSel] = useState('Todos');
   const [busqueda, setBusqueda] = useState("");
   const [userLocation, setUserLocation] = useState(null);
@@ -243,6 +252,14 @@ function AppContent() {
     setView(target);
   };
 
+  const handleResetComplete = () => {
+    setResetToken('');
+    if (window.location.pathname.includes('reset-password')) {
+      window.history.replaceState(null, '', '/');
+    }
+    setView('perfil');
+  };
+
   const guardarLugar = async (e) => {
     e.preventDefault();
     try {
@@ -413,13 +430,16 @@ function AppContent() {
         />
       )}
 
-      {view === 'perfil' && (
+      {['perfil', 'forgotPassword', 'resetPassword'].includes(view) && (
         <ProfileScreen
           user={user}
           isAuthenticated={isAuthenticated}
           onLogout={handleLogout}
           onNavigate={navigate}
           onAuthSuccess={handleAuthSuccess}
+          mode={view}
+          resetToken={resetToken}
+          onResetComplete={handleResetComplete}
           notifCount={notifCount}
         />
       )}

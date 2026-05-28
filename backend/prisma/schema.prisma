@@ -26,6 +26,7 @@ model Usuario {
   resenas    Resena[]
   favoritos  Favorito[]
   reportes   Reporte[]
+  passwordResetTokens PasswordResetToken[]
 
   @@map("usuarios")
 }
@@ -121,4 +122,19 @@ model Reporte {
 
   @@unique([resenaId, reportadoPor])
   @@map("reportes")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  usuarioId String
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
 }
