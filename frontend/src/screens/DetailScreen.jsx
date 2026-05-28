@@ -247,7 +247,7 @@ export default function DetailScreen({
       </div>
 
       {/* MOBILE */}
-      <div className="bottom-panel is-expanded" style={{ transform: 'translateY(0)', maxHeight: '80vh' }}>
+      <div className="bottom-panel is-expanded" style={{ transform: 'translateY(0)', maxHeight: '92vh' }}>
         <div className="panel-back" onClick={onBack}>
           <ArrowLeft size={16} strokeWidth={1.5} /> Volver al mapa
         </div>
