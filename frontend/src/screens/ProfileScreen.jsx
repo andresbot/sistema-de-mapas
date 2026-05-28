@@ -1,8 +1,117 @@
 import React, { useState } from 'react';
-import { LogOut, Sun, Moon } from 'lucide-react';
+import { LogOut, Sun, Moon, ShieldCheck, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import PanelNav from '../components/shared/PanelNav';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api.js';
+
+function ModerationPanel() {
+  const [reportes, setReportes] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [filter, setFilter] = React.useState('pendiente');
+
+  const fetchReportes = async (status) => {
+    setLoading(true);
+    try {
+      const res = await api.get(`/admin/reportes?status=${status}&limit=10`);
+      setReportes(res.data.data || []);
+    } catch { setReportes([]); }
+    finally { setLoading(false); }
+  };
+
+  React.useEffect(() => { fetchReportes(filter); }, [filter]);
+
+  const handleAction = async (id, status) => {
+    try {
+      await api.patch(`/admin/reportes/${id}`, { status });
+      fetchReportes(filter);
+    } catch { /* silent */ }
+  };
+
+  const MOTIVO_LABELS = { spam: 'Spam', ofensivo: 'Ofensivo', falso: 'Falso', otro: 'Otro' };
+
+  return (
+    <div style={{ marginTop: '1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+        <ShieldCheck size={16} color="var(--amber)" strokeWidth={1.5} />
+        <span style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em',
+          textTransform: 'uppercase', color: 'var(--amber)' }}>
+          Moderación
+        </span>
+      </div>
+
+      <div style={{ display: 'flex', gap: '0.3rem', marginBottom: '0.8rem' }}>
+        {['pendiente', 'resuelto', 'descartado'].map(s => (
+          <button key={s} type="button"
+            className={`chip${filter === s ? ' is-active' : ''}`}
+            style={{ fontSize: '0.65rem', padding: '0.2rem 0.6rem' }}
+            onClick={() => setFilter(s)}>
+            {s}
+          </button>
+        ))}
+      </div>
+
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-3)', fontSize: '0.8rem' }}>
+          Cargando…
+        </div>
+      ) : reportes.length === 0 ? (
+        <div className="empty-state" style={{ padding: '1rem 0' }}>
+          <p>No hay reportes {filter === 'pendiente' ? 'pendientes' : filter + 's'}.</p>
+        </div>
+      ) : (
+        <div>
+          {reportes.map(r => (
+            <div key={r.id} style={{
+              background: 'rgba(255,255,255,0.03)', border: '1px solid var(--amber-border)',
+              borderRadius: 'var(--r)', padding: '0.7rem 0.9rem', marginBottom: '0.5rem'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
+                    <AlertTriangle size={11} color="var(--warn)" strokeWidth={2} />
+                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--amber)' }}>
+                      {MOTIVO_LABELS[r.motivo] || r.motivo}
+                    </span>
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-3)' }}>
+                      · {r.resena?.lugar?.nombre || 'Lugar desconocido'}
+                    </span>
+                  </div>
+                  {r.resena?.comentario && (
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-2)', lineHeight: 1.4,
+                      overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical' }}>
+                      "{r.resena.comentario}"
+                    </p>
+                  )}
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-3)', marginTop: '0.2rem' }}>
+                    Reportado por {r.usuario?.nombre || 'usuario'}
+                    {' · '}{new Date(r.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+                {filter === 'pendiente' && (
+                  <div style={{ display: 'flex', gap: '0.3rem', flexShrink: 0 }}>
+                    <button type="button" className="btn btn--icon"
+                      style={{ width: 28, height: 28, background: 'rgba(16,185,129,0.12)',
+                        borderColor: 'rgba(16,185,129,0.3)', color: '#10b981' }}
+                      onClick={() => handleAction(r.id, 'resuelto')} title="Resolver">
+                      <CheckCircle size={13} strokeWidth={2} />
+                    </button>
+                    <button type="button" className="btn btn--icon"
+                      style={{ width: 28, height: 28 }}
+                      onClick={() => handleAction(r.id, 'descartado')} title="Descartar">
+                      <XCircle size={13} strokeWidth={1.5} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function initials(name = '') {
   return name.split(' ').filter(Boolean).slice(0, 2).map(n => n[0]).join('').toUpperCase() || '?';
@@ -96,6 +205,9 @@ export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavig
           <LogOut size={15} strokeWidth={1.5} /> Cerrar sesión
         </button>
       </div>
+      {user?.rol === 'admin' && (
+        <ModerationPanel />
+      )}
     </div>
   );
 
