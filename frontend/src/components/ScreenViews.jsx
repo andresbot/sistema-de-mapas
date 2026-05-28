@@ -252,7 +252,7 @@ export function ExplorerScreen({
   );
 }
 
-export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, relatedPlaces = [], onOpenAdd, onDelete, onAddReview, onDeleteReview, currentUserId, isFavorited = false, onToggleFavorito, onOpenPublicProfile }) {
+export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, relatedPlaces = [], onOpenAdd, onDelete, onAddReview, onDeleteReview, currentUserId, isFavorited = false, onToggleFavorito, onOpenPublicProfile, onSharePlace, onReportReview }) {
   const meta = categoryMeta(place?.categoria);
   const [puntuacion, setPuntuacion] = useState(5);
   const [comentario, setComentario] = useState('');
@@ -319,6 +319,15 @@ export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, related
                 aria-label={isFavorited ? 'Quitar de favoritos' : 'Guardar en favoritos'}
               >
                 {isFavorited ? '🔖' : '🏷️'}
+              </button>
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => onSharePlace?.(place)}
+                aria-label="Compartir lugar"
+                title="Compartir lugar"
+              >
+                🔗
               </button>
             </div>
 
@@ -422,6 +431,17 @@ export function DetailScreen({ place, onBack, onNavigate, onSelectPlace, related
                           onClick={() => onDeleteReview?.(place.id, review.id)}
                         >
                           Eliminar
+                        </button>
+                      )}
+                      {currentUserId && review.usuarioId !== currentUserId && (
+                        <button
+                          type="button"
+                          className="pill-button pill-button--ghost"
+                          style={{ padding: '0.35rem 0.7rem', fontSize: '0.75rem' }}
+                          onClick={() => onReportReview?.(place.id, review.id)}
+                          title="Reportar reseña"
+                        >
+                          ⚑ Reportar
                         </button>
                       )}
                     </div>

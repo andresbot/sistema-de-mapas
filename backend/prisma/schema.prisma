@@ -25,6 +25,7 @@ model Usuario {
   lugares    Lugar[]
   resenas    Resena[]
   favoritos  Favorito[]
+  reportes   Reporte[]
 
   @@map("usuarios")
 }
@@ -83,8 +84,9 @@ model Resena {
   lugarId   String
   usuarioId String
 
-  lugar   Lugar   @relation(fields: [lugarId], references: [id])
-  usuario Usuario @relation(fields: [usuarioId], references: [id])
+  lugar    Lugar    @relation(fields: [lugarId], references: [id])
+  usuario  Usuario  @relation(fields: [usuarioId], references: [id])
+  reportes Reporte[]
 
   @@unique([lugarId, usuarioId])
   @@map("resenas")
@@ -102,4 +104,21 @@ model Favorito {
 
   @@unique([lugarId, usuarioId])
   @@map("favoritos")
+}
+
+model Reporte {
+  id        String   @id @default(cuid())
+  motivo    String
+  status    String   @default("pendiente")
+  createdAt DateTime @default(now())
+
+  resenaId     String
+  lugarId      String
+  reportadoPor String
+
+  resena  Resena  @relation(fields: [resenaId], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [reportadoPor], references: [id], onDelete: Cascade)
+
+  @@unique([resenaId, reportadoPor])
+  @@map("reportes")
 }

@@ -106,6 +106,26 @@ function AppContent() {
     }
   }, [showToast]);
 
+  const handleSharePlace = useCallback(async (place) => {
+    const mapsUrl = `https://www.google.com/maps?q=${place.latitud},${place.longitud}`;
+    const text = `${place.nombre} — ${place.categoria}${place.direccion ? ` · ${place.direccion}` : ''}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: place.nombre, text, url: mapsUrl });
+      } catch {
+        // usuario canceló — silencioso
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(`${text}\n${mapsUrl}`);
+        showToast('Enlace copiado al portapapeles');
+      } catch {
+        showToast('No se pudo copiar el enlace', 'error');
+      }
+    }
+  }, [showToast]);
+
   // --- CARGA DE DATOS Y GPS ---
   useEffect(() => {
     fetchLugares();
@@ -118,6 +138,17 @@ function AppContent() {
       );
     }
   }, [fetchFavoritos]);
+
+  const handleReportReview = useCallback(async (lugarId, resenaId) => {
+    if (!isAuthenticated) { requireAuth('detalle'); return; }
+    try {
+      await api.post(`/lugares/${lugarId}/resenas/${resenaId}/reportes`, { motivo: 'otro' });
+      showToast('Reseña reportada. Gracias por ayudarnos.');
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Error al reportar';
+      showToast(msg, 'error');
+    }
+  }, [isAuthenticated, showToast]);
 
   if (loading) {
     return (
@@ -309,6 +340,8 @@ function AppContent() {
           isFavorited={favoritoIds.has(selectedPlace?.id)}
           onToggleFavorito={handleToggleFavorito}
           onOpenPublicProfile={handleOpenPublicProfile}
+          onSharePlace={handleSharePlace}
+          onReportReview={handleReportReview}
         />
       )}
 
