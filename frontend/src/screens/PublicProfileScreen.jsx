@@ -28,18 +28,18 @@ export default function PublicProfileScreen({ profile, onBack, onSelectPlace, on
           </div>
           {sinceYear && <div className="eyebrow" style={{ marginTop: '0.15rem' }}>Miembro desde {sinceYear}</div>}
           <div style={{ fontSize: '0.72rem', color: 'var(--text-2)', marginTop: '0.1rem' }}>
-            {profile.lugares.length} lugar{profile.lugares.length !== 1 ? 'es' : ''} publicado{profile.lugares.length !== 1 ? 's' : ''}
+            {profile.lugares?.length || 0} lugar{(profile.lugares?.length || 0) !== 1 ? 'es' : ''} publicado{(profile.lugares?.length || 0) !== 1 ? 's' : ''}
           </div>
         </div>
       </div>
 
-      {profile.lugares.length === 0 ? (
+      {!(profile.lugares?.length) ? (
         <div className="empty-state" style={{ padding: '1.5rem 0' }}>
           <p>Este usuario no ha publicado lugares aún.</p>
         </div>
       ) : (
         <div className="place-list" style={{ padding: 0 }}>
-          {profile.lugares.map(place => (
+          {(profile.lugares || []).map(place => (
             <PlaceCard key={place.id} place={place} onClick={onSelectPlace} />
           ))}
         </div>

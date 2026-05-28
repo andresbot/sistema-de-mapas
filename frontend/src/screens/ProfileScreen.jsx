@@ -74,7 +74,7 @@ export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavig
     </div>
   );
 
-  const profileContent = (
+  const profileContent = !user ? null : (
     <div style={{ padding: '0 1.2rem 1.5rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.8rem 0 1.2rem' }}>
         <div className="profile-avatar">{initials(user?.nombre)}</div>
