@@ -142,9 +142,12 @@
 .panel-back:hover { color: var(--amber); }
 
 /* ── DESKTOP ── */
+.desktop-panel { display: none; }
+
 @media (min-width: 960px) {
   .bottom-panel { display: none !important; }
   .chips-float  { display: none !important; }
+  .search-float__avatar { display: none; } /* avatar lives in panel-header on desktop */
   .desktop-panel {
     position: absolute; top: 0; right: 0; bottom: 0; width: 320px; z-index: 20;
     background: var(--glass-strong); border-left: 1px solid var(--amber-border);

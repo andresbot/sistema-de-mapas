@@ -94,8 +94,7 @@ export default function ExplorerScreen({
         <PanelNav activeView="mapa" onNavigate={onNavigate} />
 
         <div style={{ padding: '0.6rem 1rem 0' }}>
-          <SearchBar value={search} onChange={setSearch} />
-          <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
             {['Todos', 'Restaurante', 'Parque', 'Cultura', 'Tienda'].map(cat => (
               <button key={cat} type="button"
                 className={`chip${category === cat ? ' is-active' : ''}`}
