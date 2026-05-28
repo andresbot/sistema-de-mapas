@@ -9,6 +9,15 @@ export default function AddPlaceScreen({
   values, setValues, coords, onCoordsChange, onSubmit,
   onBack, onUseCurrentLocation, userLocation, isAuthenticated, onNavigate, notifCount = 0,
 }) {
+  const [panelExpanded, setPanelExpanded] = React.useState(false);
+  const [pinCoords, setPinCoords] = React.useState(null);
+
+  const handleCoordsChange = React.useCallback((c) => {
+    setPinCoords(c);
+    onCoordsChange(c);
+    setPanelExpanded(true);
+  }, [onCoordsChange]);
+
   const formContent = (
     <div style={{ padding: '0 1.2rem 1.5rem' }}>
       <div style={{ marginBottom: '1rem' }}>
@@ -76,14 +85,18 @@ export default function AddPlaceScreen({
         <MapContainer
           lugares={[]}
           userLocation={userLocation}
-          onMapClick={onCoordsChange}
+          onMapClick={handleCoordsChange}
           onOpenDetail={null}
           style={{ width: '100%', height: '100%' }}
+          selectedPin={pinCoords}
         />
       </div>
 
       {/* MOBILE */}
-      <div className="bottom-panel is-expanded" style={{ transform: 'translateY(0)', maxHeight: '92vh' }}>
+      <div className={`bottom-panel ${panelExpanded ? 'is-expanded' : 'is-collapsed'}`} style={{ maxHeight: '92vh' }}>
+        <div className="panel-handle-wrap" onClick={() => setPanelExpanded(v => !v)}>
+          <div className="panel-handle" />
+        </div>
         <div className="panel-back" onClick={onBack}>
           <ArrowLeft size={16} strokeWidth={1.5} /> Cancelar
         </div>
