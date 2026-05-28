@@ -8,6 +8,7 @@ import lugaresRoutes from './routes/lugares.routes.js';
 import favoritosRoutes from './routes/favoritos.routes.js';
 import usuariosRoutes from './routes/usuarios.routes.js';
 import reportesRoutes from './routes/reportes.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 const app = express();
 const PORT = Number(process.env.PORT || 5000);
@@ -20,6 +21,7 @@ app.use('/api', lugaresRoutes);
 app.use('/api', favoritosRoutes);
 app.use('/api', usuariosRoutes);
 app.use('/api', reportesRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/api/health', async (req, res) => {
   try {

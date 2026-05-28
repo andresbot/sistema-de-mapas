@@ -50,4 +50,11 @@ const getCurrentUser = async (req, res) => {
   });
 };
 
-export { verifyToken, getCurrentUser };
+const verifyAdmin = (req, res, next) => {
+  if (req.user?.rol !== 'admin') {
+    return res.status(403).json({ success: false, message: 'Acceso restringido a administradores' });
+  }
+  next();
+};
+
+export { verifyToken, getCurrentUser, verifyAdmin };
