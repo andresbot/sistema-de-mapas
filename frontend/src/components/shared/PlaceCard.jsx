@@ -11,6 +11,8 @@ function getCategoryIcon(categoria = '') {
 }
 
 export default function PlaceCard({ place, onClick }) {
+  if (!place) return null;
+
   const icon = place.categoriaIcono || getCategoryIcon(place.categoria);
   const rating = Number(place.puntuacionPromedio || 0).toFixed(1);
 
