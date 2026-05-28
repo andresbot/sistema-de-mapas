@@ -4,14 +4,12 @@ import { ThemeProvider } from './context/ThemeContext';
 import api from './services/api.js';
 import { getLugares, getFavoritos, toggleFavorito } from './services/placesService';
 import Toast from './components/Toast';
-import {
-  AddPlaceScreen,
-  DetailScreen,
-  ExplorerScreen,
-  ProfileScreen,
-  PublicProfileScreen,
-  SavedScreen,
-} from './components/ScreenViews';
+import ExplorerScreen      from './screens/ExplorerScreen';
+import DetailScreen        from './screens/DetailScreen';
+import AddPlaceScreen      from './screens/AddPlaceScreen';
+import SavedScreen         from './screens/SavedScreen';
+import ProfileScreen       from './screens/ProfileScreen';
+import PublicProfileScreen from './screens/PublicProfileScreen';
 import {
   FALLBACK_CENTER,
 } from './data/demoContent';
