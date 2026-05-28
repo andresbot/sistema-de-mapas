@@ -14,7 +14,7 @@ function initials(name = '') {
 export default function ExplorerScreen({
   places, filteredPlaces, search, setSearch, category, setCategory,
   onSelectPlace, onOpenAdd, onNavigate, onMapClick,
-  userLocation, isAuthenticated, user, onLogout,
+  userLocation, isAuthenticated, user, onLogout, notifCount = 0,
 }) {
   const [panelOpen, setPanelOpen] = useState(false);
   const { isDark, toggleTheme } = useTheme();
@@ -51,7 +51,7 @@ export default function ExplorerScreen({
           <div className="panel-handle" />
         </div>
 
-        <PanelNav activeView="mapa" onNavigate={onNavigate} />
+        <PanelNav activeView="mapa" onNavigate={onNavigate} notifCount={notifCount} />
 
         <div className="place-list">
           {filteredPlaces.length === 0 ? (
@@ -91,7 +91,7 @@ export default function ExplorerScreen({
           </div>
         </div>
 
-        <PanelNav activeView="mapa" onNavigate={onNavigate} />
+        <PanelNav activeView="mapa" onNavigate={onNavigate} notifCount={notifCount} />
 
         <div style={{ padding: '0.6rem 1rem 0' }}>
           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>

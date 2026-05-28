@@ -33,7 +33,7 @@ export default function DetailScreen({
   place, onBack, onNavigate, onSelectPlace, relatedPlaces = [],
   onOpenAdd, onDelete, onAddReview, onDeleteReview, currentUserId,
   isFavorited = false, onToggleFavorito, onOpenPublicProfile,
-  onSharePlace, onReportReview,
+  onSharePlace, onReportReview, notifCount = 0,
 }) {
   const [puntuacion, setPuntuacion] = useState(5);
   const [comentario, setComentario] = useState('');
@@ -261,7 +261,7 @@ export default function DetailScreen({
         <div className="panel-back" onClick={onBack}>
           <ArrowLeft size={16} strokeWidth={1.5} /> Volver
         </div>
-        <PanelNav activeView="detalle" onNavigate={onNavigate} />
+        <PanelNav activeView="detalle" onNavigate={onNavigate} notifCount={notifCount} />
         <div className="panel-content" style={{ overflowY: 'auto' }}>
           {panelContent}
         </div>

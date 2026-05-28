@@ -26,14 +26,14 @@ function SavedContent({ savedPlaces, onSelectPlace, onNavigate }) {
   );
 }
 
-export default function SavedScreen({ onNavigate, savedPlaces = [], onSelectPlace }) {
+export default function SavedScreen({ onNavigate, savedPlaces = [], onSelectPlace, notifCount = 0 }) {
   return (
     <div className="app-container">
       <div className="map-layer" style={{ background: 'var(--bg-2)' }} />
 
       {/* MOBILE */}
       <div className="bottom-panel is-expanded" style={{ transform: 'translateY(0)', maxHeight: '100vh' }}>
-        <PanelNav activeView="guardados" onNavigate={onNavigate} />
+        <PanelNav activeView="guardados" onNavigate={onNavigate} notifCount={notifCount} />
         <div className="panel-content" style={{ overflowY: 'auto' }}>
           <SavedContent savedPlaces={savedPlaces} onSelectPlace={onSelectPlace} onNavigate={onNavigate} />
         </div>
@@ -44,7 +44,7 @@ export default function SavedScreen({ onNavigate, savedPlaces = [], onSelectPlac
         <div className="panel-header">
           <div className="panel-brand">Guardados<br /><small>tus favoritos</small></div>
         </div>
-        <PanelNav activeView="guardados" onNavigate={onNavigate} />
+        <PanelNav activeView="guardados" onNavigate={onNavigate} notifCount={notifCount} />
         <div className="panel-content" style={{ overflowY: 'auto' }}>
           <SavedContent savedPlaces={savedPlaces} onSelectPlace={onSelectPlace} onNavigate={onNavigate} />
         </div>

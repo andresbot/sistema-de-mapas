@@ -44,6 +44,7 @@ function AppContent() {
   const [selectedCoords, setSelectedCoords] = useState(null);
   const [nuevoLugar, setNuevoLugar] = useState(initialForm);
   const [toast, setToast] = useState(null);
+  const [notifCount, setNotifCount] = useState(0);
 
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type });
@@ -64,6 +65,14 @@ function AppContent() {
       const data = await getFavoritos();
       setSavedPlaces(data);
       setFavoritoIds(new Set(data.map((p) => p.id)));
+    } catch { /* silent */ }
+  }, [isAuthenticated]);
+
+  const fetchNotificaciones = useCallback(async () => {
+    if (!isAuthenticated) { setNotifCount(0); return; }
+    try {
+      const res = await api.get('/notificaciones');
+      setNotifCount(res.data?.total || 0);
     } catch { /* silent */ }
   }, [isAuthenticated]);
 
@@ -128,6 +137,7 @@ function AppContent() {
   useEffect(() => {
     fetchLugares();
     fetchFavoritos();
+    fetchNotificaciones();
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (p) => setUserLocation({ lat: p.coords.latitude, lng: p.coords.longitude }),
@@ -135,7 +145,7 @@ function AppContent() {
         { enableHighAccuracy: true }
       );
     }
-  }, [fetchFavoritos]);
+  }, [fetchFavoritos, fetchNotificaciones]);
 
   const handleReportReview = useCallback(async (lugarId, resenaId, motivo = 'otro') => {
     if (!isAuthenticated) { requireAuth('detalle'); return; }
@@ -320,6 +330,7 @@ function AppContent() {
           isAuthenticated={isAuthenticated}
           user={user}
           onLogout={handleLogout}
+          notifCount={notifCount}
         />
       )}
 
@@ -340,6 +351,7 @@ function AppContent() {
           onOpenPublicProfile={handleOpenPublicProfile}
           onSharePlace={handleSharePlace}
           onReportReview={handleReportReview}
+          notifCount={notifCount}
         />
       )}
 
@@ -355,6 +367,7 @@ function AppContent() {
           userLocation={userLocation}
           isAuthenticated={isAuthenticated}
           onNavigate={navigate}
+          notifCount={notifCount}
         />
       )}
 
@@ -363,6 +376,7 @@ function AppContent() {
           onNavigate={navigate}
           savedPlaces={savedPlaces}
           onSelectPlace={handleSelectPlace}
+          notifCount={notifCount}
         />
       )}
 
@@ -373,6 +387,7 @@ function AppContent() {
           onSelectPlace={handleSelectPlace}
           onNavigate={navigate}
           isAuthenticated={isAuthenticated}
+          notifCount={notifCount}
         />
       )}
 
@@ -383,6 +398,7 @@ function AppContent() {
           onLogout={handleLogout}
           onNavigate={navigate}
           onAuthSuccess={handleAuthSuccess}
+          notifCount={notifCount}
         />
       )}
     </div>

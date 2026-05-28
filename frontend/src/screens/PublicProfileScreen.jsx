@@ -7,7 +7,7 @@ function initials(name = '') {
   return name.split(' ').filter(Boolean).slice(0, 2).map(n => n[0]).join('').toUpperCase() || '?';
 }
 
-export default function PublicProfileScreen({ profile, onBack, onSelectPlace, onNavigate, isAuthenticated = false }) {
+export default function PublicProfileScreen({ profile, onBack, onSelectPlace, onNavigate, isAuthenticated = false, notifCount = 0 }) {
   if (!profile) return null;
 
   const sinceYear = profile.miembro ? new Date(profile.miembro).getFullYear() : null;
@@ -60,7 +60,7 @@ export default function PublicProfileScreen({ profile, onBack, onSelectPlace, on
       {/* DESKTOP */}
       <div className="desktop-panel">
         <div className="panel-back" onClick={onBack}><ArrowLeft size={16} strokeWidth={1.5} /> Volver</div>
-        <PanelNav activeView="mapa" onNavigate={onNavigate} isAuthenticated={isAuthenticated} />
+        <PanelNav activeView="mapa" onNavigate={onNavigate} isAuthenticated={isAuthenticated} notifCount={notifCount} />
         <div className="panel-content" style={{ overflowY: 'auto' }}>{content}</div>
       </div>
     </div>

@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { id: 'perfil',   icon: User,       label: 'Perfil'    },
 ];
 
-export default function PanelNav({ activeView, onNavigate }) {
+export default function PanelNav({ activeView, onNavigate, notifCount = 0 }) {
   return (
     <div className="panel-nav">
       {NAV_ITEMS.map(({ id, icon: Icon, label }) => (
@@ -18,7 +18,21 @@ export default function PanelNav({ activeView, onNavigate }) {
           className={`panel-nav__item${activeView === id ? ' is-active' : ''}`}
           onClick={() => onNavigate(id)}
         >
-          <Icon size={18} strokeWidth={activeView === id ? 2 : 1.5} />
+          <span style={{ position: 'relative', display: 'inline-flex' }}>
+            <Icon size={18} strokeWidth={activeView === id ? 2 : 1.5} />
+            {id === 'perfil' && notifCount > 0 && (
+              <span style={{
+                position: 'absolute', top: -4, right: -5,
+                width: 14, height: 14, borderRadius: '50%',
+                background: '#EF4444', color: '#fff',
+                fontSize: '0.5rem', fontWeight: 800,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                lineHeight: 1,
+              }}>
+                {notifCount > 9 ? '9+' : notifCount}
+              </span>
+            )}
+          </span>
           {label}
         </button>
       ))}

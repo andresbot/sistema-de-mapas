@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogOut, Sun, Moon, ShieldCheck, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { LogOut, Sun, Moon, ShieldCheck, CheckCircle, XCircle, AlertTriangle, Bell } from 'lucide-react';
 import PanelNav from '../components/shared/PanelNav';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -113,11 +113,55 @@ function ModerationPanel() {
   );
 }
 
+function ActivityFeed({ userId }) {
+  const [items, setItems] = React.useState([]);
+  const [loaded, setLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    api.get('/notificaciones').then(res => {
+      setItems(res.data?.data?.slice(0, 5) || []);
+      setLoaded(true);
+    }).catch(() => setLoaded(true));
+  }, []);
+
+  if (!loaded) return null;
+  if (items.length === 0) return (
+    <div style={{ padding: '0.5rem 0', fontSize: '0.78rem', color: 'var(--text-3)' }}>
+      Sin actividad reciente en tus lugares.
+    </div>
+  );
+
+  return (
+    <div>
+      {items.map(n => (
+        <div key={n.id} style={{
+          padding: '0.55rem 0', borderBottom: '1px solid rgba(245,158,11,0.06)',
+          fontSize: '0.78rem', color: 'var(--text-2)', lineHeight: 1.4
+        }}>
+          <span style={{ fontWeight: 600, color: 'var(--text-1)' }}>{n.autor}</span>
+          {' reseñó '}
+          <span style={{ color: 'var(--amber)' }}>{n.lugarNombre}</span>
+          {n.puntuacion && ` · ${'★'.repeat(n.puntuacion)}`}
+          {n.comentario && (
+            <span style={{ display: 'block', color: 'var(--text-3)', fontSize: '0.72rem', marginTop: '0.1rem',
+              overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>
+              "{n.comentario}"
+            </span>
+          )}
+          <span style={{ fontSize: '0.65rem', color: 'var(--text-3)' }}>
+            {new Date(n.createdAt).toLocaleDateString()}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function initials(name = '') {
   return name.split(' ').filter(Boolean).slice(0, 2).map(n => n[0]).join('').toUpperCase() || '?';
 }
 
-export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavigate, onAuthSuccess }) {
+export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavigate, onAuthSuccess, notifCount = 0 }) {
   const { isDark, toggleTheme } = useTheme();
   const { login, register } = useAuth();
   const [tab, setTab] = useState('login');
@@ -194,6 +238,16 @@ export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavig
           <div style={{ fontSize: '0.75rem', color: 'var(--text-2)', marginTop: '0.1rem' }}>{user?.email}</div>
         </div>
       </div>
+      <div style={{ marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
+          <Bell size={14} color="var(--amber)" strokeWidth={1.5} />
+          <span style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em',
+            textTransform: 'uppercase', color: 'var(--amber)' }}>
+            Actividad reciente
+          </span>
+        </div>
+        <ActivityFeed userId={user?.id} />
+      </div>
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
         <button type="button" className="btn btn--ghost" onClick={toggleTheme}
           style={{ flex: 1, gap: '0.4rem' }}>
@@ -217,7 +271,7 @@ export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavig
 
       {/* MOBILE */}
       <div className="bottom-panel is-expanded" style={{ transform: 'translateY(0)', maxHeight: '100vh' }}>
-        <PanelNav activeView="perfil" onNavigate={onNavigate} />
+        <PanelNav activeView="perfil" onNavigate={onNavigate} notifCount={notifCount} />
         <div className="panel-content" style={{ overflowY: 'auto' }}>
           {isAuthenticated ? profileContent : authContent}
         </div>
@@ -230,7 +284,7 @@ export default function ProfileScreen({ user, isAuthenticated, onLogout, onNavig
             Perfil<br /><small>{isAuthenticated ? user?.nombre : 'no autenticado'}</small>
           </div>
         </div>
-        <PanelNav activeView="perfil" onNavigate={onNavigate} />
+        <PanelNav activeView="perfil" onNavigate={onNavigate} notifCount={notifCount} />
         <div className="panel-content" style={{ overflowY: 'auto' }}>
           {isAuthenticated ? profileContent : authContent}
         </div>

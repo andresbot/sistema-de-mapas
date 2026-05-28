@@ -7,7 +7,7 @@ const CATEGORIES = ['Restaurante', 'Parque', 'Cultura', 'Tienda', 'Servicio', 'T
 
 export default function AddPlaceScreen({
   values, setValues, coords, onCoordsChange, onSubmit,
-  onBack, onUseCurrentLocation, userLocation, isAuthenticated, onNavigate,
+  onBack, onUseCurrentLocation, userLocation, isAuthenticated, onNavigate, notifCount = 0,
 }) {
   const formContent = (
     <div style={{ padding: '0 1.2rem 1.5rem' }}>
@@ -97,7 +97,7 @@ export default function AddPlaceScreen({
         <div className="panel-back" onClick={onBack}>
           <ArrowLeft size={16} strokeWidth={1.5} /> Cancelar
         </div>
-        <PanelNav activeView="añadir" onNavigate={onNavigate} />
+        <PanelNav activeView="añadir" onNavigate={onNavigate} notifCount={notifCount} />
         <div className="panel-content" style={{ overflowY: 'auto' }}>
           {formContent}
         </div>
