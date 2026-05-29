@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Rol {
+  user
+  admin
+}
+
+model Usuario {
+  id        String   @id @default(cuid())
+  nombre    String
+  email     String   @unique
+  password  String
+  avatar    String?
+  rol       Rol      @default(user)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lugares    Lugar[]
+  resenas    Resena[]
+  favoritos  Favorito[]
+  reportes   Reporte[]
+  lugarVisitas LugarVista[]
+  busquedas  BusquedaLugar[]
+  passwordResetTokens PasswordResetToken[]
+
+  @@map("usuarios")
+}
+
+model Categoria {
+  id          String  @id @default(cuid())
+  nombre      String
+  slug        String  @unique
+  icono       String
+  color       String
+  descripcion String?
+
+  lugares Lugar[]
+
+  @@map("categorias")
+}
+
+model Lugar {
+  id                 String   @id @default(cuid())
+  nombre             String
+  descripcion        String?
+  latitud            Float
+  longitud           Float
+  direccion          String?
+  telefono           String?
+  horario            String?
+  sitioWeb           String?
+  imagenes           Json?
+  publicado          Boolean  @default(true)
+  puntuacionPromedio Float    @default(0)
+  totalResenas       Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  categoriaId String
+  creadorId   String
+
+  categoria Categoria  @relation(fields: [categoriaId], references: [id])
+  creador   Usuario    @relation(fields: [creadorId], references: [id])
+  resenas   Resena[]
+  favoritos Favorito[]
+  vistas    LugarVista[]
+
+  @@map("lugares")
+}
+
+model Resena {
+  id          String    @id @default(cuid())
+  puntuacion  Int
+  comentario  String?
+  imagenes    Json?
+  fechaVisita DateTime?
+  meGusta     Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  lugarId   String
+  usuarioId String
+
+  lugar    Lugar    @relation(fields: [lugarId], references: [id])
+  usuario  Usuario  @relation(fields: [usuarioId], references: [id])
+  reportes Reporte[]
+
+  @@unique([lugarId, usuarioId])
+  @@map("resenas")
+}
+
+model Favorito {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  lugarId   String
+  usuarioId String
+
+  lugar   Lugar   @relation(fields: [lugarId], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([lugarId, usuarioId])
+  @@map("favoritos")
+}
+
+model Reporte {
+  id        String   @id @default(cuid())
+  motivo    String
+  status    String   @default("pendiente")
+  createdAt DateTime @default(now())
+
+  resenaId     String
+  lugarId      String
+  reportadoPor String
+
+  resena  Resena  @relation(fields: [resenaId], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [reportadoPor], references: [id], onDelete: Cascade)
+
+  @@unique([resenaId, reportadoPor])
+  @@map("reportes")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  usuarioId String
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model LugarVista {
+  id        String   @id @default(cuid())
+  visitorId String?
+  createdAt DateTime @default(now())
+
+  lugarId   String
+  usuarioId String?
+
+  lugar   Lugar    @relation(fields: [lugarId], references: [id], onDelete: Cascade)
+  usuario Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@index([lugarId])
+  @@index([usuarioId])
+  @@index([createdAt])
+  @@map("lugar_vistas")
+}
+
+model BusquedaLugar {
+  id        String   @id @default(cuid())
+  query     String
+  createdAt DateTime @default(now())
+
+  usuarioId String
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([createdAt])
+  @@map("busquedas_lugar")
+}

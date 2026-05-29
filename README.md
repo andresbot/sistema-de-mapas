@@ -60,20 +60,20 @@ cd mapas
 ### 2. Instalar dependencias del frontend
 
 ```bash
-cd client
+cd frontend
 npm install
 ```
 
 ### 3. Instalar dependencias del backend
 
 ```bash
-cd ../server
+cd ../backend
 npm install
 ```
 
 ### 4. Configurar variables de entorno
 
-Crea un archivo `.env` en la carpeta `server`:
+Crea un archivo `.env` en la carpeta `backend`:
 
 ```env
 PORT=5000
@@ -90,14 +90,14 @@ NODE_ENV=development
 
 **Terminal 1 - Backend:**
 ```bash
-cd server
+cd backend
 npm run dev
 ```
 El servidor correrá en `http://localhost:5000`
 
 **Terminal 2 - Frontend:**
 ```bash
-cd client
+cd frontend
 npm run dev
 ```
 La app estará en `http://localhost:5173`
@@ -108,7 +108,7 @@ La app estará en `http://localhost:5173`
 
 ```
 mapas/
-├── client/          # Frontend React
+├── frontend/          # Frontend React
 │   ├── src/
 │   │   ├── components/
 │   │   ├── pages/
@@ -116,7 +116,7 @@ mapas/
 │   │   └── services/
 │   └── package.json
 │
-├── server/          # Backend Node.js
+├── backend/          # Backend Node.js
 │   ├── src/
 │   │   ├── models/
 │   │   ├── routes/
@@ -124,7 +124,7 @@ mapas/
 │   │   └── middleware/
 │   └── package.json
 │
-└── ARCHITECTURE.md  # Documentación de arquitectura
+└── ARCHITECTURE.md   # Documentación de arquitectura
 ```
 
 Ver [ARCHITECTURE.md](ARCHITECTURE.md) para detalles completos.
@@ -134,13 +134,64 @@ Ver [ARCHITECTURE.md](ARCHITECTURE.md) para detalles completos.
 ## 🎯 Roadmap
 
 - [x] Configuración inicial del proyecto
+- [x] Arquitectura frontend + backend
 - [ ] Mapa interactivo básico
 - [ ] Sistema de categorías
-- [ ] Backend con Express y MongoDB
 - [ ] Autenticación de usuarios
 - [ ] CRUD de lugares
 - [ ] Sistema de reseñas
 - [ ] Subida de imágenes
 - [ ] Deploy a producción
-
+ 
 ---
+
+## **Prisma (MySQL)**
+
+- **Resumen**: El backend usa Prisma como ORM con MySQL. El esquema Prisma está en [backend/prisma/schema.prisma](backend/prisma/schema.prisma).
+
+- **Variables de entorno**: Copia `backend/.env.example` a `backend/.env` y ajusta `DATABASE_URL` (ejemplo: `mysql://root:password@localhost:3306/mapas_db`).
+
+- **Comandos útiles**
+
+	- Aplicar migraciones (desarrollo, interactivo — crea/actualiza migraciones y genera el cliente):
+
+		```bash
+		cd backend
+		npx prisma migrate dev
+		```
+
+	- Aplicar migraciones en producción/CI (no interactivo, usa migraciones ya generadas):
+
+		```bash
+		cd backend
+		npx prisma migrate deploy
+		```
+
+	- Generar Prisma Client:
+
+		```bash
+		cd backend
+		npx prisma generate
+		```
+
+	- Sembrar datos (si existe el script):
+
+		```bash
+		cd backend
+		node src/scripts/seed.js
+		```
+
+- **Actualizar Prisma**: si ves un aviso de actualización (por ejemplo `6.x -> 7.x`), actualiza con:
+
+	```bash
+	cd backend
+	npm i --save-dev prisma@latest
+	npm i @prisma/client@latest
+	```
+
+- **Archivos clave**
+	- [backend/prisma/schema.prisma](backend/prisma/schema.prisma)
+	- [backend/prisma/migrations/](backend/prisma/migrations/)
+	- [backend/.env.example](backend/.env.example)
+
+Si quieres, también puedo actualizar la sección **Backend** para reflejar que ahora se usa MySQL + Prisma.

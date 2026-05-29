@@ -1,0 +1,64 @@
+/* frontend/src/styles/tokens.css */
+:root, [data-theme="dark"] {
+  --bg:           #0C0C0E;
+  --bg-2:         #111118;
+  --bg-3:         #16161F;
+  --bg-map-dim:   rgba(5,5,8,0.46);
+  --glass:        rgba(12,12,14,0.88);
+  --glass-strong: rgba(10,10,16,0.96);
+  --glass-soft:   rgba(18,18,26,0.76);
+
+  --amber:        #F59E0B;
+  --rose:         #E11D48;
+  --teal:         #2DD4BF;
+  --amber-dim:    rgba(245,158,11,0.18);
+  --amber-glow:   rgba(245,158,11,0.10);
+  --amber-border: rgba(245,158,11,0.22);
+  --amber-grad:   linear-gradient(135deg,#F59E0B,#D97706);
+
+  --text-1: #F5F0E8;
+  --text-2: #A89880;
+  --text-3: #5C5248;
+  --text-inv: #0C0C0E;
+
+  --success:      #10B981;
+  --danger:       #EF4444;
+  --danger-soft:  rgba(239,68,68,0.12);
+  --warn:         #F59E0B;
+
+  --r-sm: 8px; --r: 14px; --r-lg: 20px; --r-xl: 28px; --r-pill: 999px;
+  --ease: 0.22s cubic-bezier(0.4,0,0.2,1);
+  --ease-slow: 0.45s cubic-bezier(0.4,0,0.2,1);
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font: 'DM Sans', system-ui, sans-serif;
+  --sh-sm: 0 1px 4px rgba(0,0,0,0.3);
+  --sh-md: 0 8px 28px rgba(0,0,0,0.4);
+  --sh-lg: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+[data-theme="light"] {
+  --bg:           #F5F0E8;
+  --bg-2:         #FFFFFF;
+  --bg-3:         #EDE8DC;
+  --bg-map-dim:   rgba(245,240,232,0.24);
+  --glass:        rgba(245,240,232,0.88);
+  --glass-strong: rgba(245,240,232,0.96);
+  --glass-soft:   rgba(255,255,255,0.78);
+  --amber:        #B45309;
+  --rose:         #BE123C;
+  --teal:         #0F766E;
+  --amber-dim:    rgba(180,83,9,0.15);
+  --amber-glow:   rgba(180,83,9,0.10);
+  --amber-border: rgba(180,83,9,0.28);
+  --amber-grad:   linear-gradient(135deg,#B45309,#92400E);
+  --text-1: #1A1208;
+  --text-2: #5C5248;
+  --text-3: #7A6D59;
+  --text-inv: #F5F0E8;
+  --success: #047857;
+  --danger:  #DC2626;
+  --danger-soft: rgba(220,38,38,0.12);
+  --sh-sm: 0 1px 4px rgba(26,18,8,0.15);
+  --sh-md: 0 8px 28px rgba(26,18,8,0.20);
+  --sh-lg: 0 20px 60px rgba(26,18,8,0.25);
+}
