@@ -2,7 +2,14 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import api from './services/api.js';
-import { getLugares, getFavoritos, toggleFavorito, recordPlaceVisit } from './services/placesService';
+import {
+  getLugares,
+  getFavoritos,
+  toggleFavorito,
+  recordPlaceVisit,
+  getRecommendations,
+  recordSearchBehavior,
+} from './services/placesService';
 import Toast from './components/Toast';
 import LandingScreen       from './screens/LandingScreen';
 import ExplorerScreen      from './screens/ExplorerScreen';
@@ -52,6 +59,9 @@ function AppContent() {
   const [savedPlaces, setSavedPlaces] = useState([]);
   const [favoritoIds, setFavoritoIds] = useState(new Set());
   const [publicProfile, setPublicProfile] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
+  const [recommendationsMeta, setRecommendationsMeta] = useState({ hasPersonalization: false, rules: {} });
+  const [recommendationsLoading, setRecommendationsLoading] = useState(false);
 
   const [selectedCoords, setSelectedCoords] = useState(null);
   const [nuevoLugar, setNuevoLugar] = useState(initialForm);
@@ -86,6 +96,30 @@ function AppContent() {
       const res = await api.get('/notificaciones');
       setNotifCount(res.data?.total || 0);
     } catch { /* silent */ }
+  }, [isAuthenticated]);
+
+  const fetchRecommendations = useCallback(async () => {
+    if (!isAuthenticated) {
+      setRecommendations([]);
+      setRecommendationsMeta({ hasPersonalization: false, rules: {} });
+      setRecommendationsLoading(false);
+      return;
+    }
+
+    setRecommendationsLoading(true);
+    try {
+      const data = await getRecommendations(6);
+      setRecommendations(data.items || []);
+      setRecommendationsMeta({
+        hasPersonalization: Boolean(data.hasPersonalization),
+        rules: data.rules || {},
+      });
+    } catch {
+      setRecommendations([]);
+      setRecommendationsMeta({ hasPersonalization: false, rules: {} });
+    } finally {
+      setRecommendationsLoading(false);
+    }
   }, [isAuthenticated]);
 
   const places = lugares;
@@ -152,6 +186,7 @@ function AppContent() {
         fetchLugares(),
         fetchFavoritos(),
         fetchNotificaciones(),
+        fetchRecommendations(),
       ]);
     };
 
@@ -163,7 +198,20 @@ function AppContent() {
         { enableHighAccuracy: true }
       );
     }
-  }, [fetchLugares, fetchFavoritos, fetchNotificaciones]);
+  }, [fetchLugares, fetchFavoritos, fetchNotificaciones, fetchRecommendations]);
+
+  useEffect(() => {
+    const query = busqueda.trim();
+    if (!isAuthenticated || query.length < 2) return undefined;
+
+    const timer = window.setTimeout(() => {
+      void recordSearchBehavior(query)
+        .then(fetchRecommendations)
+        .catch(() => {});
+    }, 700);
+
+    return () => window.clearTimeout(timer);
+  }, [busqueda, fetchRecommendations, isAuthenticated]);
 
   const requireAuth = useCallback((nextView, coords) => {
     if (isAuthenticated) {
@@ -237,7 +285,9 @@ function AppContent() {
   const handleSelectPlace = (place) => {
     setSelectedPlaceId(place.id);
     setView('detalle');
-    void recordPlaceVisit(place.id).catch(() => {});
+    void recordPlaceVisit(place.id)
+      .then(fetchRecommendations)
+      .catch(() => {});
   };
 
   const navigate = (target) => {
@@ -312,6 +362,7 @@ function AppContent() {
     try {
       await toggleFavorito(lugarId);
       await fetchFavoritos();
+      await fetchRecommendations();
     } catch { showToast('Error al actualizar favorito', 'error'); }
   };
 
@@ -326,6 +377,7 @@ function AppContent() {
       }
       await api.post(`/lugares/${lugarId}/resenas`, reviewData);
       await fetchLugares();
+      await fetchRecommendations();
       showToast('Reseña publicada');
     } catch (err) {
       showToast(err.response?.data?.message || 'Ya has reseñado este lugar', 'error');
@@ -336,6 +388,7 @@ function AppContent() {
     try {
       await api.delete(`/lugares/${lugarId}/resenas/${resenaId}`);
       await fetchLugares();
+      await fetchRecommendations();
       showToast('Reseña eliminada');
     } catch (err) {
       showToast(err.response?.data?.message || 'Error al eliminar la reseña', 'error');
@@ -373,8 +426,11 @@ function AppContent() {
           onNavigate={navigate}
           onMapClick={handleMapClick}
           userLocation={userLocation}
-          isAuthenticated={isAuthenticated}
           user={user}
+          isAuthenticated={isAuthenticated}
+          recommendations={recommendations}
+          recommendationsMeta={recommendationsMeta}
+          recommendationsLoading={recommendationsLoading}
           onLogout={handleLogout}
           notifCount={notifCount}
         />

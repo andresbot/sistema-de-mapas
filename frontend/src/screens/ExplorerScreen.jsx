@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Compass, Home, PlusCircle, Sun, Moon } from 'lucide-react';
+import { Compass, Home, PlusCircle, Sparkles, Sun, Moon } from 'lucide-react';
 import MapContainer from '../components/MapContainer';
 import SearchBar from '../components/shared/SearchBar';
 import CategoryChips from '../components/shared/CategoryChips';
@@ -11,10 +11,66 @@ function initials(name = '') {
   return name.split(' ').filter(Boolean).slice(0, 2).map(n => n[0]).join('').toUpperCase() || '?';
 }
 
+function RecommendationsPanel({
+  recommendations = [],
+  meta = {},
+  loading = false,
+  isAuthenticated = false,
+  onSelectPlace,
+}) {
+  if (!isAuthenticated) return null;
+
+  const title = meta.hasPersonalization ? 'Recomendado para ti' : 'Para empezar';
+  const subtitle = meta.hasPersonalization
+    ? 'Basado en tus búsquedas, visitas y favoritos recientes.'
+    : 'Busca o abre lugares para personalizar más esta lista.';
+
+  return (
+    <section className="recommendations-panel">
+      <div className="recommendations-panel__head">
+        <span className="recommendations-panel__icon">
+          <Sparkles size={14} strokeWidth={1.8} />
+        </span>
+        <div>
+          <p className="eyebrow">{title}</p>
+          <h3>{subtitle}</h3>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="recommendations-panel__loading">Actualizando recomendaciones...</div>
+      ) : recommendations.length === 0 ? (
+        <div className="recommendations-panel__empty">
+          Abre algunos lugares o guarda favoritos para activar recomendaciones.
+        </div>
+      ) : (
+        <div className="recommendations-list">
+          {recommendations.slice(0, 3).map((place) => (
+            <button
+              key={place.id}
+              type="button"
+              className="recommendation-card"
+              onClick={() => onSelectPlace?.(place)}
+            >
+              <span className="recommendation-card__icon">{place.categoriaIcono || '📍'}</span>
+              <span className="recommendation-card__body">
+                <strong>{place.nombre}</strong>
+                <small>{place.reason || place.categoria}</small>
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function ExplorerScreen({
   filteredPlaces, search, setSearch, category, setCategory,
   onSelectPlace, onOpenAdd, onNavigate, onMapClick,
-  userLocation, user, notifCount = 0,
+  userLocation, user, isAuthenticated = false,
+  recommendations = [], recommendationsMeta = {}, recommendationsLoading = false,
+  notifCount = 0,
 }) {
   const [panelOpen, setPanelOpen] = useState(false);
   const { isDark, toggleTheme } = useTheme();
@@ -53,6 +109,14 @@ export default function ExplorerScreen({
         </div>
 
         <PanelNav activeView="mapa" onNavigate={onNavigate} notifCount={notifCount} />
+
+        <RecommendationsPanel
+          recommendations={recommendations}
+          meta={recommendationsMeta}
+          loading={recommendationsLoading}
+          isAuthenticated={isAuthenticated}
+          onSelectPlace={onSelectPlace}
+        />
 
         <div className="place-list">
           {filteredPlaces.length === 0 ? (
@@ -105,6 +169,14 @@ export default function ExplorerScreen({
             <p>Busca por nombre, categoría o dirección y abre el detalle para reseñar, guardar o compartir.</p>
           </div>
         </section>
+
+        <RecommendationsPanel
+          recommendations={recommendations}
+          meta={recommendationsMeta}
+          loading={recommendationsLoading}
+          isAuthenticated={isAuthenticated}
+          onSelectPlace={onSelectPlace}
+        />
 
         <div style={{ padding: '0.6rem 1rem 0' }}>
           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>

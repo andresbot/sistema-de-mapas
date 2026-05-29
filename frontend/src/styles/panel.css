@@ -1122,6 +1122,111 @@
   line-height: 1.45;
 }
 
+.recommendations-panel {
+  margin: 0.75rem 1rem 0.35rem;
+  padding: 0.85rem;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--amber-dim), rgba(255,255,255,0.025));
+  border: 1px solid rgba(245,158,11,0.14);
+}
+
+.recommendations-panel__head {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  margin-bottom: 0.65rem;
+}
+
+.recommendations-panel__icon {
+  width: 1.9rem;
+  height: 1.9rem;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  color: var(--amber);
+  background: rgba(245,158,11,0.12);
+  border: 1px solid var(--amber-border);
+}
+
+.recommendations-panel h3 {
+  margin: 0.15rem 0 0;
+  color: var(--text-2);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.recommendations-list {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.recommendation-card {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  gap: 0.6rem;
+  padding: 0.58rem;
+  text-align: left;
+  border-radius: var(--r);
+  color: var(--text-1);
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(245,158,11,0.1);
+  transition: background var(--ease), border-color var(--ease), transform var(--ease);
+}
+
+.recommendation-card:hover {
+  background: var(--amber-glow);
+  border-color: var(--amber-border);
+  transform: translateY(-1px);
+}
+
+.recommendation-card__icon {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 0.75rem;
+  background: var(--amber-dim);
+  border: 1px solid var(--amber-border);
+}
+
+.recommendation-card__body {
+  min-width: 0;
+}
+
+.recommendation-card__body strong,
+.recommendation-card__body small {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recommendation-card__body strong {
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.8rem;
+}
+
+.recommendation-card__body small,
+.recommendations-panel__loading,
+.recommendations-panel__empty {
+  color: var(--text-3);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.recommendations-panel__loading,
+.recommendations-panel__empty {
+  padding: 0.45rem 0.1rem 0.15rem;
+}
+
 @media (min-width: 960px) {
   .landing-content {
     grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.42fr);

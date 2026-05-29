@@ -4,6 +4,7 @@ import { prisma } from '../config/prisma.js';
 export const getLugares = async (req, res) => {
   try {
     const lugares = await prisma.lugar.findMany({
+      where: { publicado: true },
       include: {
         categoria: {
           select: { nombre: true, icono: true, color: true },

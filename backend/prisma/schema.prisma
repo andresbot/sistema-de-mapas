@@ -27,6 +27,7 @@ model Usuario {
   favoritos  Favorito[]
   reportes   Reporte[]
   lugarVisitas LugarVista[]
+  busquedas  BusquedaLugar[]
   passwordResetTokens PasswordResetToken[]
 
   @@map("usuarios")
@@ -156,4 +157,17 @@ model LugarVista {
   @@index([usuarioId])
   @@index([createdAt])
   @@map("lugar_vistas")
+}
+
+model BusquedaLugar {
+  id        String   @id @default(cuid())
+  query     String
+  createdAt DateTime @default(now())
+
+  usuarioId String
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([createdAt])
+  @@map("busquedas_lugar")
 }

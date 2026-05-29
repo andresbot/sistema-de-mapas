@@ -46,3 +46,13 @@ export const recordPlaceVisit = async (lugarId) => {
   });
   return response.data;
 };
+
+export const getRecommendations = async (limit = 6) => {
+  const response = await api.get(`/recomendaciones?limit=${limit}`);
+  return response.data?.data || { items: [], hasPersonalization: false, rules: {} };
+};
+
+export const recordSearchBehavior = async (query) => {
+  const response = await api.post('/recomendaciones/busquedas', { query });
+  return response.data;
+};
