@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 
 export const REVIEW_IMAGE_FOLDER = process.env.CLOUDINARY_REVIEW_FOLDER || 'sistema-mapas/resenas';
+export const PLACE_IMAGE_FOLDER = process.env.CLOUDINARY_PLACE_FOLDER || 'sistema-mapas/lugares';
 export const REVIEW_UPLOAD_PRESET = process.env.CLOUDINARY_UPLOAD_PRESET || '';
 
 const getRequiredConfig = () => {
@@ -36,11 +37,11 @@ export const configureCloudinary = () => {
   return { cloudName, apiKey, apiSecret };
 };
 
-export const createReviewUploadSignature = () => {
+export const createImageUploadSignature = (folder = REVIEW_IMAGE_FOLDER) => {
   const { cloudName, apiKey, apiSecret } = configureCloudinary();
   const timestamp = Math.round(Date.now() / 1000);
   const paramsToSign = {
-    folder: REVIEW_IMAGE_FOLDER,
+    folder,
     timestamp,
   };
 
@@ -54,11 +55,15 @@ export const createReviewUploadSignature = () => {
     cloudName,
     apiKey,
     timestamp,
-    folder: REVIEW_IMAGE_FOLDER,
+    folder,
     uploadPreset: REVIEW_UPLOAD_PRESET || null,
     signature,
   };
 };
+
+export const createReviewUploadSignature = () => createImageUploadSignature(REVIEW_IMAGE_FOLDER);
+
+export const createPlaceUploadSignature = () => createImageUploadSignature(PLACE_IMAGE_FOLDER);
 
 export const deleteCloudinaryImage = async (publicId) => {
   if (!publicId || !isCloudinaryConfigured()) return null;

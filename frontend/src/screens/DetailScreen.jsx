@@ -9,6 +9,7 @@ import PlaceCard from '../components/shared/PlaceCard';
 import MapContainer from '../components/MapContainer';
 import {
   MAX_REVIEW_IMAGES,
+  MAX_PLACE_IMAGES,
   MAX_REVIEW_IMAGE_BYTES,
   REVIEW_IMAGE_TYPES,
   uploadReviewImages,
@@ -38,6 +39,12 @@ function StarRow({ value, onChange, readonly = false }) {
 function getReviewImages(imagenes) {
   return Array.isArray(imagenes)
     ? imagenes.filter((image) => image?.secureUrl && image?.publicId).slice(0, MAX_REVIEW_IMAGES)
+    : [];
+}
+
+function getPlaceImages(imagenes) {
+  return Array.isArray(imagenes)
+    ? imagenes.filter((image) => image?.secureUrl && image?.publicId).slice(0, MAX_PLACE_IMAGES)
     : [];
 }
 
@@ -156,6 +163,7 @@ export default function DetailScreen({
   };
 
   const related = (relatedPlaces || []).filter(p => p.id !== place.id).slice(0, 3);
+  const placeImages = getPlaceImages(place.imagenes);
 
   const panelContent = (
     <div style={{ padding: '0 1.2rem 1.5rem' }}>
@@ -201,6 +209,22 @@ export default function DetailScreen({
           </button>
         )}
       </div>
+
+      {placeImages.length > 0 && (
+        <div className="place-gallery" aria-label="Fotos del lugar">
+          {placeImages.map((image, index) => (
+            <button
+              key={image.publicId || image.secureUrl}
+              type="button"
+              className="place-gallery__item"
+              onClick={() => setLightboxImage(image)}
+              aria-label={`Ver foto ${index + 1}`}
+            >
+              <img src={image.secureUrl} alt={`Foto ${index + 1} de ${place.nombre}`} loading="lazy" />
+            </button>
+          ))}
+        </div>
+      )}
 
       {(place.descripcion || place.direccion || place.horario || place.telefono || place.sitioWeb) && (
         <div className="detail-section">

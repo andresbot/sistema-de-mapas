@@ -11,6 +11,9 @@ const PlacePopup = ({ lugar, onOpenDetail, onDelete }) => {
   const { isAuthenticated } = useAuth();
 
   const color = lugar.categoriaColor || '#007AFF';
+  const imagenes = Array.isArray(lugar.imagenes)
+    ? lugar.imagenes.filter((image) => image?.secureUrl).slice(0, 3)
+    : [];
   const categoryStyle = {
     background: color.startsWith('#') ? `${color}22` : 'var(--amber-dim)',
     color,
@@ -19,6 +22,18 @@ const PlacePopup = ({ lugar, onOpenDetail, onDelete }) => {
 
   return (
     <div className="popup-card">
+      {imagenes.length > 0 && (
+        <div className={`popup-gallery popup-gallery--count-${imagenes.length}`} aria-label="Fotos del lugar">
+          {imagenes.map((image, index) => (
+            <img
+              key={image.publicId || image.secureUrl}
+              src={image.secureUrl}
+              alt={`Foto ${index + 1} de ${lugar.nombre}`}
+              loading="lazy"
+            />
+          ))}
+        </div>
+      )}
 
       {/* Cabecera: badge de categoría */}
       <span

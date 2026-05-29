@@ -1,8 +1,11 @@
 import api from './api.js';
 
 export const MAX_REVIEW_IMAGES = 3;
+export const MAX_PLACE_IMAGES = 5;
 export const MAX_REVIEW_IMAGE_BYTES = 5 * 1024 * 1024;
+export const MAX_PLACE_IMAGE_BYTES = 5 * 1024 * 1024;
 export const REVIEW_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+export const PLACE_IMAGE_TYPES = REVIEW_IMAGE_TYPES;
 
 const toReviewImageMetadata = (result) => ({
   publicId: result.public_id,
@@ -13,10 +16,10 @@ const toReviewImageMetadata = (result) => ({
   bytes: result.bytes,
 });
 
-export const uploadReviewImages = async (files) => {
+const uploadCloudinaryImages = async (files, target = 'review') => {
   if (!files?.length) return [];
 
-  const signatureRes = await api.post('/uploads/signature');
+  const signatureRes = await api.post('/uploads/signature', { target });
   const signatureData = signatureRes.data?.data;
 
   if (!signatureData?.cloudName || !signatureData?.apiKey || !signatureData?.signature) {
@@ -51,3 +54,7 @@ export const uploadReviewImages = async (files) => {
 
   return Promise.all(uploads);
 };
+
+export const uploadReviewImages = (files) => uploadCloudinaryImages(files, 'review');
+
+export const uploadPlaceImages = (files) => uploadCloudinaryImages(files, 'place');

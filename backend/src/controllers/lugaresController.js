@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { prisma } from '../config/prisma.js';
-import { deleteCloudinaryImage, REVIEW_IMAGE_FOLDER } from '../config/cloudinary.js';
+import { deleteCloudinaryImage, PLACE_IMAGE_FOLDER, REVIEW_IMAGE_FOLDER } from '../config/cloudinary.js';
 
 export const getLugares = async (req, res) => {
   try {
@@ -30,6 +30,7 @@ export const getLugares = async (req, res) => {
       horario: lugar.horario,
       telefono: lugar.telefono,
       sitioWeb: lugar.sitioWeb,
+      imagenes: lugar.imagenes || [],
       puntuacionPromedio: lugar.puntuacionPromedio,
       totalResenas: lugar.totalResenas,
       categoria: lugar.categoria?.nombre || 'General',
@@ -71,6 +72,7 @@ const optionalShortText = (value) => {
 };
 
 const MAX_REVIEW_IMAGES = 3;
+const MAX_PLACE_IMAGES = 5;
 const MAX_REVIEW_IMAGE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_REVIEW_IMAGE_FORMATS = new Set(['jpg', 'jpeg', 'png', 'webp']);
 
@@ -88,7 +90,7 @@ const isValidHttpsUrl = (value) => {
   }
 };
 
-const normalizeReviewImages = (imagenes) => {
+const normalizeCloudinaryImages = (imagenes, { maxImages, folder, label }) => {
   if (imagenes === undefined || imagenes === null) {
     return { images: [], error: null };
   }
@@ -97,11 +99,11 @@ const normalizeReviewImages = (imagenes) => {
     return { images: [], error: 'imagenes debe ser una lista' };
   }
 
-  if (imagenes.length > MAX_REVIEW_IMAGES) {
-    return { images: [], error: `Solo puedes subir hasta ${MAX_REVIEW_IMAGES} imagenes por resena` };
+  if (imagenes.length > maxImages) {
+    return { images: [], error: `Solo puedes subir hasta ${maxImages} imagenes por ${label}` };
   }
 
-  const expectedPrefix = `${REVIEW_IMAGE_FOLDER}/`;
+  const expectedPrefix = `${folder}/`;
   const images = [];
 
   for (const item of imagenes) {
@@ -150,7 +152,19 @@ const normalizeReviewImages = (imagenes) => {
   return { images, error: null };
 };
 
-const cleanupReviewImages = async (imagenes) => {
+const normalizeReviewImages = (imagenes) => normalizeCloudinaryImages(imagenes, {
+  maxImages: MAX_REVIEW_IMAGES,
+  folder: REVIEW_IMAGE_FOLDER,
+  label: 'resena',
+});
+
+const normalizePlaceImages = (imagenes) => normalizeCloudinaryImages(imagenes, {
+  maxImages: MAX_PLACE_IMAGES,
+  folder: PLACE_IMAGE_FOLDER,
+  label: 'lugar',
+});
+
+const cleanupCloudinaryImages = async (imagenes) => {
   if (!Array.isArray(imagenes) || imagenes.length === 0) return;
 
   const results = await Promise.allSettled(
@@ -226,11 +240,17 @@ export const crearLugar = async (req, res) => {
       direccion,
       horario,
       telefono,
+      imagenes,
     } = req.body;
     const creadorId = req.user.id;
+    const { images: placeImages, error: imageError } = normalizePlaceImages(imagenes);
 
     if (!nombre || latitud === undefined || longitud === undefined) {
       return res.status(400).json({ success: false, message: 'nombre, latitud y longitud son requeridos' });
+    }
+
+    if (imageError) {
+      return res.status(400).json({ success: false, message: imageError });
     }
 
     const slug = categoria.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -251,6 +271,7 @@ export const crearLugar = async (req, res) => {
         direccion: optionalText(direccion),
         horario: optionalText(horario),
         telefono: optionalText(telefono),
+        imagenes: placeImages.length > 0 ? placeImages : null,
         latitud: parseFloat(latitud),
         longitud: parseFloat(longitud),
         categoriaId: cat.id,
@@ -270,6 +291,7 @@ export const crearLugar = async (req, res) => {
         direccion: lugar.direccion,
         horario: lugar.horario,
         telefono: lugar.telefono,
+        imagenes: lugar.imagenes || [],
         categoria: lugar.categoria.nombre,
         categoriaIcono: lugar.categoria.icono,
         categoriaColor: lugar.categoria.color,
@@ -296,6 +318,7 @@ export const eliminarLugar = async (req, res) => {
     }
 
     await prisma.lugar.delete({ where: { id } });
+    await cleanupCloudinaryImages(lugar.imagenes);
     res.json({ success: true, message: 'Lugar eliminado correctamente' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -331,7 +354,7 @@ export const eliminarResena = async (req, res) => {
       },
     });
 
-    await cleanupReviewImages(resena.imagenes);
+    await cleanupCloudinaryImages(resena.imagenes);
 
     res.json({ success: true, message: 'Reseña eliminada correctamente' });
   } catch (error) {
