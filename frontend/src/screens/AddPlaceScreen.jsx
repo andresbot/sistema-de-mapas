@@ -1,9 +1,27 @@
 import React from 'react';
-import { ArrowLeft, Clock3, Home, MapPin, Navigation, Phone, Send, SquarePen } from 'lucide-react';
+import { ArrowLeft, Clock3, Home, ImagePlus, MapPin, Navigation, Phone, Send, SquarePen, X } from 'lucide-react';
 import MapContainer from '../components/MapContainer';
 import PanelNav from '../components/shared/PanelNav';
+import {
+  MAX_PLACE_IMAGES,
+  MAX_PLACE_IMAGE_BYTES,
+  PLACE_IMAGE_TYPES,
+  uploadPlaceImages,
+} from '../services/uploadService.js';
 
 const CATEGORIES = ['Restaurante', 'Parque', 'Cultura', 'Tienda', 'Servicio', 'Turismo', 'General'];
+
+function formatImageSize(bytes) {
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function makePreviewImage(file) {
+  return {
+    id: `${file.name}-${file.size}-${file.lastModified}-${Math.random().toString(36).slice(2)}`,
+    file,
+    previewUrl: URL.createObjectURL(file),
+  };
+}
 
 export default function AddPlaceScreen({
   values, setValues, coords, onCoordsChange, onSubmit,
@@ -11,12 +29,90 @@ export default function AddPlaceScreen({
 }) {
   const [panelExpanded, setPanelExpanded] = React.useState(false);
   const [pinCoords, setPinCoords] = React.useState(null);
+  const [selectedImages, setSelectedImages] = React.useState([]);
+  const selectedImagesRef = React.useRef([]);
+  const [imageError, setImageError] = React.useState('');
+  const [submitting, setSubmitting] = React.useState(false);
+
+  React.useEffect(() => {
+    selectedImagesRef.current = selectedImages;
+  }, [selectedImages]);
+
+  React.useEffect(() => () => {
+    selectedImagesRef.current.forEach((image) => URL.revokeObjectURL(image.previewUrl));
+  }, []);
 
   const handleCoordsChange = React.useCallback((c) => {
     setPinCoords(c);
     onCoordsChange(c);
     setPanelExpanded(true);
   }, [onCoordsChange]);
+
+  const removeSelectedImage = (imageId) => {
+    setSelectedImages((current) => {
+      const image = current.find((item) => item.id === imageId);
+      if (image) URL.revokeObjectURL(image.previewUrl);
+      return current.filter((item) => item.id !== imageId);
+    });
+  };
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (!files.length) return;
+
+    const nextImages = [];
+    const errors = [];
+
+    for (const file of files) {
+      if (selectedImages.length + nextImages.length >= MAX_PLACE_IMAGES) {
+        errors.push(`Solo puedes adjuntar ${MAX_PLACE_IMAGES} imagenes por lugar.`);
+        break;
+      }
+
+      if (!PLACE_IMAGE_TYPES.has(file.type)) {
+        errors.push(`${file.name}: usa JPG, PNG o WebP.`);
+        continue;
+      }
+
+      if (file.size > MAX_PLACE_IMAGE_BYTES) {
+        errors.push(`${file.name}: maximo ${formatImageSize(MAX_PLACE_IMAGE_BYTES)}.`);
+        continue;
+      }
+
+      nextImages.push(makePreviewImage(file));
+    }
+
+    if (nextImages.length > 0) {
+      setSelectedImages((current) => [...current, ...nextImages]);
+    }
+
+    setImageError(errors[0] || '');
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (submitting || !values.nombre?.trim() || !coords) return;
+
+    setSubmitting(true);
+    setImageError('');
+
+    try {
+      const imagenes = selectedImages.length
+        ? await uploadPlaceImages(selectedImages.map((image) => image.file))
+        : [];
+      const saved = await onSubmit(event, imagenes);
+
+      if (saved !== false) {
+        selectedImagesRef.current.forEach((image) => URL.revokeObjectURL(image.previewUrl));
+        selectedImagesRef.current = [];
+      }
+    } catch (error) {
+      setImageError(error.message || 'No se pudieron subir las imagenes.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const formContent = (
     <div style={{ padding: '0 1.2rem 1.5rem' }}>
@@ -44,7 +140,7 @@ export default function AddPlaceScreen({
         )}
       </div>
 
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className="form-field">
           <label>Nombre del lugar *</label>
           <input type="text" value={values.nombre} required placeholder="ej. Café del Centro"
@@ -101,10 +197,48 @@ export default function AddPlaceScreen({
           </div>
         </div>
 
+        <div className="form-section-title">
+          <ImagePlus size={13} strokeWidth={1.5} /> Fotos del lugar
+        </div>
+
+        <div className="place-upload">
+          <label className="review-upload__trigger">
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              onChange={handleImageChange}
+              disabled={submitting || selectedImages.length >= MAX_PLACE_IMAGES}
+            />
+            <ImagePlus size={14} strokeWidth={1.7} />
+            <span>Agregar fotos</span>
+            <small>{selectedImages.length}/{MAX_PLACE_IMAGES}</small>
+          </label>
+
+          {selectedImages.length > 0 && (
+            <div className="place-upload__preview" aria-label="Fotos seleccionadas">
+              {selectedImages.map((image) => (
+                <figure key={image.id} className="review-upload__thumb">
+                  <img src={image.previewUrl} alt={image.file.name} />
+                  <button
+                    type="button"
+                    onClick={() => removeSelectedImage(image.id)}
+                    aria-label="Quitar foto"
+                  >
+                    <X size={11} strokeWidth={2} />
+                  </button>
+                </figure>
+              ))}
+            </div>
+          )}
+
+          {imageError && <p className="review-upload__error">{imageError}</p>}
+        </div>
+
         <button type="submit" className="btn btn--primary btn--block"
-          disabled={!values.nombre?.trim() || !coords}
+          disabled={submitting || !values.nombre?.trim() || !coords}
           style={{ marginTop: '0.5rem' }}>
-          <Send size={15} strokeWidth={2} /> Publicar lugar
+          <Send size={15} strokeWidth={2} /> {submitting ? 'Publicando...' : 'Publicar lugar'}
         </button>
       </form>
     </div>

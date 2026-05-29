@@ -302,6 +302,7 @@ CLOUDINARY_API_KEY=tu_api_key
 CLOUDINARY_API_SECRET=tu_api_secret
 CLOUDINARY_UPLOAD_PRESET=
 CLOUDINARY_REVIEW_FOLDER=sistema-mapas/resenas
+CLOUDINARY_PLACE_FOLDER=sistema-mapas/lugares
 ```
 
 Notas:
@@ -507,6 +508,7 @@ CLOUDINARY_API_KEY=tu_api_key
 CLOUDINARY_API_SECRET=tu_api_secret
 CLOUDINARY_UPLOAD_PRESET=
 CLOUDINARY_REVIEW_FOLDER=sistema-mapas/resenas
+CLOUDINARY_PLACE_FOLDER=sistema-mapas/lugares
 ```
 
 Despues del deploy, probar:

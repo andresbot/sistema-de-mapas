@@ -32,6 +32,7 @@ const initialForm = {
   direccion: '',
   horario: '',
   telefono: '',
+  imagenes: [],
   review: '',
 };
 
@@ -317,12 +318,13 @@ function AppContent() {
     setView('perfil');
   };
 
-  const guardarLugar = async (e) => {
+  const guardarLugar = async (e, imagenes = []) => {
     e.preventDefault();
     try {
       const coords = selectedCoords || userLocation || FALLBACK_CENTER;
       const datosParaEnviar = {
         ...nuevoLugar,
+        imagenes,
         latitud: coords.lat,
         longitud: coords.lng
       };
@@ -338,8 +340,10 @@ function AppContent() {
       }
       setView('detalle');
       showToast('Lugar publicado correctamente');
+      return true;
     } catch {
       showToast('Error al conectar con el servidor', 'error');
+      return false;
     }
   };
 
