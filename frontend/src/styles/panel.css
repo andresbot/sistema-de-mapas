@@ -428,6 +428,275 @@
   background: var(--glass-soft);
 }
 
+.admin-entry-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-entry-card h2,
+.admin-toolbar h2,
+.admin-section-head h2 {
+  margin: 0.15rem 0 0.25rem;
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-style: italic;
+  line-height: 1;
+}
+
+.admin-entry-card p:not(.eyebrow) {
+  max-width: 42rem;
+  color: var(--text-2);
+  font-size: 0.85rem;
+}
+
+.admin-dashboard > .workspace-panel--wide {
+  grid-column: 1 / -1;
+}
+
+.admin-toolbar,
+.admin-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.admin-range-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.2rem;
+  border-radius: var(--r-pill);
+  background: var(--amber-dim);
+  border: 1px solid var(--amber-border);
+}
+
+.admin-range-toggle button {
+  min-height: 1.9rem;
+  padding: 0.28rem 0.7rem;
+  border-radius: var(--r-pill);
+  color: var(--text-2);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.admin-range-toggle button:hover {
+  color: var(--text-1);
+}
+
+.admin-range-toggle button.is-active {
+  color: var(--text-inv);
+  background: var(--amber);
+}
+
+.admin-stat-card {
+  grid-column: span 3;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.admin-stat-card__icon {
+  width: 2.7rem;
+  height: 2.7rem;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  color: var(--amber);
+  background: var(--amber-dim);
+  border: 1px solid var(--amber-border);
+}
+
+.admin-stat-card strong,
+.admin-stat-card span,
+.admin-stat-card small {
+  display: block;
+}
+
+.admin-stat-card strong {
+  color: var(--text-1);
+  font-size: 1.65rem;
+  line-height: 1;
+}
+
+.admin-stat-card span {
+  margin-top: 0.25rem;
+  color: var(--amber);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.admin-stat-card small,
+.admin-section-head small {
+  color: var(--text-3);
+  font-size: 0.72rem;
+}
+
+.admin-stat-card .admin-stat-card__icon {
+  display: grid;
+  place-items: center;
+}
+
+.admin-stat-card__icon svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.admin-error {
+  color: var(--danger);
+  border-color: rgba(239,68,68,0.28);
+  background: rgba(239,68,68,0.08);
+  font-size: 0.86rem;
+}
+
+.admin-loading {
+  padding: 2rem 0;
+  color: var(--text-3);
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.admin-empty {
+  min-height: 14rem;
+  border: 1px dashed var(--amber-border);
+  border-radius: var(--r-lg);
+}
+
+.admin-table {
+  margin-top: 1rem;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  border: 1px solid rgba(245,158,11,0.1);
+}
+
+.admin-table__row {
+  display: grid;
+  grid-template-columns: minmax(13rem, 1fr) repeat(4, minmax(5rem, 0.45fr));
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 0.9rem;
+  color: var(--text-2);
+  font-size: 0.82rem;
+  border-bottom: 1px solid rgba(245,158,11,0.08);
+}
+
+.admin-table__row:last-child {
+  border-bottom: 0;
+}
+
+.admin-table__row > span:not(:first-child) {
+  color: var(--text-1);
+  font-weight: 800;
+  text-align: right;
+}
+
+.admin-table__row strong,
+.admin-table__row small {
+  display: block;
+  min-width: 0;
+}
+
+.admin-table__row strong {
+  color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-table__row small {
+  margin-top: 0.1rem;
+  color: var(--text-3);
+  font-size: 0.68rem;
+}
+
+.admin-table__head {
+  color: var(--amber);
+  background: var(--amber-dim);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-report-list {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.admin-report-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border-radius: var(--r);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(245,158,11,0.1);
+}
+
+.admin-report-card__body {
+  min-width: 0;
+}
+
+.admin-report-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--amber);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.admin-report-card__meta span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-3);
+  font-weight: 600;
+}
+
+.admin-report-card p {
+  margin: 0.35rem 0;
+  color: var(--text-2);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.admin-report-card small {
+  color: var(--text-3);
+  font-size: 0.68rem;
+}
+
+.admin-report-card__actions {
+  display: flex;
+  gap: 0.35rem;
+  flex: 0 0 auto;
+}
+
+.admin-action-success {
+  color: var(--success);
+  background: rgba(16,185,129,0.12);
+  border-color: rgba(16,185,129,0.3);
+}
+
 @media (max-width: 860px) {
   .workspace-shell {
     padding: 0;
@@ -492,6 +761,46 @@
 
   .workspace-panel--feature {
     min-height: auto;
+  }
+
+  .admin-entry-card,
+  .admin-toolbar,
+  .admin-section-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-stat-card {
+    grid-column: auto;
+  }
+
+  .admin-toolbar__actions {
+    justify-content: flex-start;
+  }
+
+  .admin-table {
+    border: 0;
+    overflow: visible;
+  }
+
+  .admin-table__head {
+    display: none;
+  }
+
+  .admin-table__row {
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 0.6rem;
+    border: 1px solid rgba(245,158,11,0.1);
+    border-radius: var(--r);
+    background: rgba(255,255,255,0.03);
+  }
+
+  .admin-table__row > span:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .admin-table__row > span:not(:first-child) {
+    text-align: left;
   }
 }
 

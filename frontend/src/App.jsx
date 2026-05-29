@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import api from './services/api.js';
-import { getLugares, getFavoritos, toggleFavorito } from './services/placesService';
+import { getLugares, getFavoritos, toggleFavorito, recordPlaceVisit } from './services/placesService';
 import Toast from './components/Toast';
 import LandingScreen       from './screens/LandingScreen';
 import ExplorerScreen      from './screens/ExplorerScreen';
@@ -11,6 +11,7 @@ import AddPlaceScreen      from './screens/AddPlaceScreen';
 import SavedScreen         from './screens/SavedScreen';
 import ProfileScreen       from './screens/ProfileScreen';
 import PublicProfileScreen from './screens/PublicProfileScreen';
+import AdminDashboardScreen from './screens/AdminDashboardScreen';
 import {
   FALLBACK_CENTER,
 } from './data/demoContent';
@@ -236,6 +237,7 @@ function AppContent() {
   const handleSelectPlace = (place) => {
     setSelectedPlaceId(place.id);
     setView('detalle');
+    void recordPlaceVisit(place.id).catch(() => {});
   };
 
   const navigate = (target) => {
@@ -246,6 +248,11 @@ function AppContent() {
 
     if (target === 'añadir') {
       handleOpenAdd();
+      return;
+    }
+
+    if (target === 'admin') {
+      setView(user?.rol === 'admin' ? 'admin' : 'perfil');
       return;
     }
 
@@ -426,6 +433,13 @@ function AppContent() {
           onSelectPlace={handleSelectPlace}
           onNavigate={navigate}
           isAuthenticated={isAuthenticated}
+          notifCount={notifCount}
+        />
+      )}
+
+      {view === 'admin' && user?.rol === 'admin' && (
+        <AdminDashboardScreen
+          onNavigate={navigate}
           notifCount={notifCount}
         />
       )}

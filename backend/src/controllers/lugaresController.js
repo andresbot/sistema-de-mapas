@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import { prisma } from '../config/prisma.js';
 
 export const getLugares = async (req, res) => {
@@ -60,6 +61,59 @@ const optionalText = (value) => {
   if (typeof value !== 'string') return null;
   const trimmed = value.trim();
   return trimmed || null;
+};
+
+const optionalShortText = (value) => {
+  const text = optionalText(value);
+  return text ? text.slice(0, 191) : null;
+};
+
+const getOptionalUsuarioId = async (req) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) return null;
+
+  try {
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret_key');
+    if (!decoded?.id) return null;
+
+    const user = await prisma.usuario.findUnique({
+      where: { id: decoded.id },
+      select: { id: true },
+    });
+
+    return user?.id || null;
+  } catch {
+    return null;
+  }
+};
+
+export const registrarVistaLugar = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const lugar = await prisma.lugar.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!lugar) {
+      return res.status(404).json({ success: false, message: 'Lugar no encontrado' });
+    }
+
+    const usuarioId = await getOptionalUsuarioId(req);
+
+    await prisma.lugarVista.create({
+      data: {
+        lugarId: id,
+        usuarioId,
+        visitorId: optionalShortText(req.body?.visitorId),
+      },
+    });
+
+    res.status(201).json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 export const crearLugar = async (req, res) => {

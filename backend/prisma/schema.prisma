@@ -26,6 +26,7 @@ model Usuario {
   resenas    Resena[]
   favoritos  Favorito[]
   reportes   Reporte[]
+  lugarVisitas LugarVista[]
   passwordResetTokens PasswordResetToken[]
 
   @@map("usuarios")
@@ -68,6 +69,7 @@ model Lugar {
   creador   Usuario    @relation(fields: [creadorId], references: [id])
   resenas   Resena[]
   favoritos Favorito[]
+  vistas    LugarVista[]
 
   @@map("lugares")
 }
@@ -137,4 +139,21 @@ model PasswordResetToken {
   @@index([usuarioId])
   @@index([expiresAt])
   @@map("password_reset_tokens")
+}
+
+model LugarVista {
+  id        String   @id @default(cuid())
+  visitorId String?
+  createdAt DateTime @default(now())
+
+  lugarId   String
+  usuarioId String?
+
+  lugar   Lugar    @relation(fields: [lugarId], references: [id], onDelete: Cascade)
+  usuario Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@index([lugarId])
+  @@index([usuarioId])
+  @@index([createdAt])
+  @@map("lugar_vistas")
 }
