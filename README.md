@@ -296,12 +296,19 @@ SMTP_SECURE=true
 SMTP_USER=tu_correo@gmail.com
 SMTP_PASS=tu_app_password_de_16_caracteres
 MAIL_FROM="sistema-mapas <tu_correo@gmail.com>"
+
+CLOUDINARY_CLOUD_NAME=tu_cloud_name
+CLOUDINARY_API_KEY=tu_api_key
+CLOUDINARY_API_SECRET=tu_api_secret
+CLOUDINARY_UPLOAD_PRESET=
+CLOUDINARY_REVIEW_FOLDER=sistema-mapas/resenas
 ```
 
 Notas:
 
 - `FRONTEND_URL` se usa para construir los enlaces de recuperacion de contrasena.
 - `SMTP_PASS` debe ser una contrasena de aplicacion de Gmail, no la contrasena normal.
+- Cloudinary se usa para subir imagenes de resenas. El upload preset es opcional si usas subida firmada.
 - `JWT_SECRET` debe ser largo y privado en produccion.
 - No subas archivos `.env` al repositorio.
 
@@ -389,6 +396,12 @@ POST /api/favoritos/:lugarId
 
 ```text
 POST /api/lugares/:id/resenas/:resenaId/reportes
+```
+
+### Uploads
+
+```text
+POST /api/uploads/signature
 ```
 
 ### Recomendaciones
@@ -489,6 +502,11 @@ SMTP_SECURE=true
 SMTP_USER=tu_correo@gmail.com
 SMTP_PASS=tu_app_password_de_16_caracteres
 MAIL_FROM=sistema-mapas <tu_correo@gmail.com>
+CLOUDINARY_CLOUD_NAME=tu_cloud_name
+CLOUDINARY_API_KEY=tu_api_key
+CLOUDINARY_API_SECRET=tu_api_secret
+CLOUDINARY_UPLOAD_PRESET=
+CLOUDINARY_REVIEW_FOLDER=sistema-mapas/resenas
 ```
 
 Despues del deploy, probar:

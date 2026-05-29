@@ -1,7 +1,12 @@
 /* frontend/src/styles/panel.css */
 
 /* ── APP SHELL ── */
-.app-container { height: 100%; position: relative; overflow: hidden; }
+.app-container {
+  --side-panel-width: clamp(380px, 26vw, 460px);
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
 .map-layer { position: absolute; inset: 0; z-index: 0; }
 
 /* ── FLOATING SEARCH ── */
@@ -211,13 +216,13 @@
   .chips-float  { display: none !important; }
   .search-float__avatar { display: none; } /* avatar lives in panel-header on desktop */
   .desktop-panel {
-    position: absolute; top: 0; right: 0; bottom: 0; width: 320px; z-index: 20;
+    position: absolute; top: 0; right: 0; bottom: 0; width: var(--side-panel-width); z-index: 20;
     background: var(--glass-strong); border-left: 1px solid var(--amber-border);
     backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
     display: flex; flex-direction: column;
   }
-  .map-layer    { right: 320px; }
-  .search-float { right: calc(320px + 1rem); }
+  .map-layer    { right: var(--side-panel-width); }
+  .search-float { right: calc(var(--side-panel-width) + 1rem); }
 }
 
 /* WORKSPACE SCREENS */
@@ -678,6 +683,21 @@
   color: var(--text-2);
   font-size: 0.8rem;
   line-height: 1.45;
+}
+
+.admin-report-card__images {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0.5rem 0;
+}
+
+.admin-report-card__images img {
+  width: 3.2rem;
+  height: 3.2rem;
+  object-fit: cover;
+  border-radius: var(--r);
+  border: 1px solid rgba(245,158,11,0.14);
+  background: rgba(255,255,255,0.04);
 }
 
 .admin-report-card small {

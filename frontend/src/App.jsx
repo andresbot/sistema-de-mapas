@@ -373,7 +373,7 @@ function AppContent() {
       if (!isAuthenticated) {
         setPendingAfterAuth({ view: 'detalle' });
         setView('perfil');
-        return;
+        return false;
       }
       await api.post(`/lugares/${lugarId}/resenas`, reviewData);
       await fetchLugares();
@@ -381,6 +381,7 @@ function AppContent() {
       showToast('Reseña publicada');
     } catch (err) {
       showToast(err.response?.data?.message || 'Ya has reseñado este lugar', 'error');
+      return false;
     }
   };
 
