@@ -22,6 +22,12 @@ const RANGE_OPTIONS = [
 
 const MOTIVO_LABELS = { spam: 'Spam', ofensivo: 'Ofensivo', falso: 'Falso', otro: 'Otro' };
 
+const getReportImages = (imagenes) => {
+  return Array.isArray(imagenes)
+    ? imagenes.filter((image) => image?.secureUrl).slice(0, 3)
+    : [];
+};
+
 function formatNumber(value) {
   return new Intl.NumberFormat('es-CO').format(value || 0);
 }
@@ -106,7 +112,10 @@ function ModerationPanel() {
         </div>
       ) : (
         <div className="admin-report-list">
-          {reportes.map((reporte) => (
+          {reportes.map((reporte) => {
+            const reportImages = getReportImages(reporte.resena?.imagenes);
+
+            return (
             <article key={reporte.id} className="admin-report-card">
               <div className="admin-report-card__body">
                 <div className="admin-report-card__meta">
@@ -116,6 +125,18 @@ function ModerationPanel() {
                 </div>
                 {reporte.resena?.comentario && (
                   <p>"{reporte.resena.comentario}"</p>
+                )}
+                {reportImages.length > 0 && (
+                  <div className="admin-report-card__images" aria-label="Imagenes de la resena reportada">
+                    {reportImages.map((image, index) => (
+                      <img
+                        key={image.publicId || image.secureUrl}
+                        src={image.secureUrl}
+                        alt={`Imagen ${index + 1} de la resena reportada`}
+                        loading="lazy"
+                      />
+                    ))}
+                  </div>
                 )}
                 <small>
                   Reportado por {reporte.usuario?.nombre || 'usuario'} ·{' '}
@@ -143,7 +164,8 @@ function ModerationPanel() {
                 </div>
               )}
             </article>
-          ))}
+            );
+          })}
         </div>
       )}
     </section>

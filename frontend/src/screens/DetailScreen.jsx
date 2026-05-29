@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft, Bookmark, BookmarkCheck, Share2, Flag,
   Star, MapPin, Clock, Phone, Globe, MessageSquare,
-  User, Trash2, X, MapPinned, Home
+  User, Trash2, X, MapPinned, Home, ImagePlus
 } from 'lucide-react';
 import PanelNav from '../components/shared/PanelNav';
 import PlaceCard from '../components/shared/PlaceCard';
 import MapContainer from '../components/MapContainer';
+import {
+  MAX_REVIEW_IMAGES,
+  MAX_REVIEW_IMAGE_BYTES,
+  REVIEW_IMAGE_TYPES,
+  uploadReviewImages,
+} from '../services/uploadService.js';
 
 function initials(name = '') {
   return name.split(' ').filter(Boolean).slice(0, 2).map(n => n[0]).join('').toUpperCase() || '?';
@@ -29,6 +35,24 @@ function StarRow({ value, onChange, readonly = false }) {
   );
 }
 
+function getReviewImages(imagenes) {
+  return Array.isArray(imagenes)
+    ? imagenes.filter((image) => image?.secureUrl && image?.publicId).slice(0, MAX_REVIEW_IMAGES)
+    : [];
+}
+
+function formatImageSize(bytes) {
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function makePreviewImage(file) {
+  return {
+    id: `${file.name}-${file.size}-${file.lastModified}-${Math.random().toString(36).slice(2)}`,
+    file,
+    previewUrl: URL.createObjectURL(file),
+  };
+}
+
 export default function DetailScreen({
   place, onBack, onNavigate, onSelectPlace, relatedPlaces = [],
   onDelete, onAddReview, onDeleteReview, currentUserId,
@@ -37,20 +61,95 @@ export default function DetailScreen({
 }) {
   const [puntuacion, setPuntuacion] = useState(5);
   const [comentario, setComentario] = useState('');
+  const [selectedImages, setSelectedImages] = useState([]);
+  const selectedImagesRef = useRef([]);
+  const [imageError, setImageError] = useState('');
+  const [lightboxImage, setLightboxImage] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [reportingId, setReportingId] = useState(null);
   const [reportMotivo, setReportMotivo] = useState('spam');
 
+  useEffect(() => {
+    selectedImagesRef.current = selectedImages;
+  }, [selectedImages]);
+
+  useEffect(() => () => {
+    selectedImagesRef.current.forEach((image) => URL.revokeObjectURL(image.previewUrl));
+  }, []);
+
   if (!place) return null;
+
+  const clearSelectedImages = () => {
+    setSelectedImages((current) => {
+      current.forEach((image) => URL.revokeObjectURL(image.previewUrl));
+      return [];
+    });
+  };
+
+  const removeSelectedImage = (imageId) => {
+    setSelectedImages((current) => {
+      const image = current.find((item) => item.id === imageId);
+      if (image) URL.revokeObjectURL(image.previewUrl);
+      return current.filter((item) => item.id !== imageId);
+    });
+  };
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (!files.length) return;
+
+    const nextImages = [];
+    const errors = [];
+
+    for (const file of files) {
+      if (selectedImages.length + nextImages.length >= MAX_REVIEW_IMAGES) {
+        errors.push(`Solo puedes adjuntar ${MAX_REVIEW_IMAGES} imagenes por resena.`);
+        break;
+      }
+
+      if (!REVIEW_IMAGE_TYPES.has(file.type)) {
+        errors.push(`${file.name}: usa JPG, PNG o WebP.`);
+        continue;
+      }
+
+      if (file.size > MAX_REVIEW_IMAGE_BYTES) {
+        errors.push(`${file.name}: maximo ${formatImageSize(MAX_REVIEW_IMAGE_BYTES)}.`);
+        continue;
+      }
+
+      nextImages.push(makePreviewImage(file));
+    }
+
+    if (nextImages.length > 0) {
+      setSelectedImages((current) => [...current, ...nextImages]);
+    }
+
+    setImageError(errors[0] || '');
+  };
 
   const submitReview = async (e) => {
     e.preventDefault();
-    if (!comentario.trim() || submitting) return;
+    if ((!comentario.trim() && selectedImages.length === 0) || submitting) return;
     setSubmitting(true);
+    setImageError('');
     try {
-      await onAddReview?.(place.id, { puntuacion, comentario });
+      const imagenes = selectedImages.length
+        ? await uploadReviewImages(selectedImages.map((image) => image.file))
+        : [];
+      const saved = await onAddReview?.(place.id, {
+        puntuacion,
+        comentario: comentario.trim(),
+        imagenes,
+      });
+
+      if (saved === false) return;
+
       setComentario('');
       setPuntuacion(5);
+      clearSelectedImages();
+    } catch (error) {
+      setImageError(error.message || 'No se pudieron subir las imagenes.');
     } finally {
       setSubmitting(false);
     }
@@ -136,9 +235,42 @@ export default function DetailScreen({
               rows={2}
               style={{ marginTop: '0.5rem', resize: 'vertical' }}
             />
+            <div className="review-upload">
+              <label className="review-upload__trigger">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  onChange={handleImageChange}
+                  disabled={submitting || selectedImages.length >= MAX_REVIEW_IMAGES}
+                />
+                <ImagePlus size={14} strokeWidth={1.7} />
+                <span>Agregar imagenes</span>
+                <small>{selectedImages.length}/{MAX_REVIEW_IMAGES}</small>
+              </label>
+
+              {selectedImages.length > 0 && (
+                <div className="review-upload__preview" aria-label="Imagenes seleccionadas">
+                  {selectedImages.map((image) => (
+                    <figure key={image.id} className="review-upload__thumb">
+                      <img src={image.previewUrl} alt={image.file.name} />
+                      <button
+                        type="button"
+                        onClick={() => removeSelectedImage(image.id)}
+                        aria-label="Quitar imagen"
+                      >
+                        <X size={11} strokeWidth={2} />
+                      </button>
+                    </figure>
+                  ))}
+                </div>
+              )}
+
+              {imageError && <p className="review-upload__error">{imageError}</p>}
+            </div>
             <button
               type="submit"
-              disabled={submitting || !comentario.trim()}
+              disabled={submitting || (!comentario.trim() && selectedImages.length === 0)}
               className="btn btn--primary btn--sm btn--block"
               style={{ marginTop: '0.5rem' }}
             >
@@ -147,7 +279,10 @@ export default function DetailScreen({
           </form>
         )}
 
-        {place.resenas?.length > 0 ? place.resenas.map(rev => (
+        {place.resenas?.length > 0 ? place.resenas.map(rev => {
+          const reviewImages = getReviewImages(rev.imagenes);
+
+          return (
           <div key={rev.id} className="review-card">
             <div className="review-card__head">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
@@ -207,8 +342,24 @@ export default function DetailScreen({
               ))}
             </div>
             {rev.comentario && <div className="review-card__text">{rev.comentario}</div>}
+            {reviewImages.length > 0 && (
+              <div className="review-gallery" aria-label="Imagenes de la resena">
+                {reviewImages.map((image, index) => (
+                  <button
+                    key={image.publicId}
+                    type="button"
+                    className="review-gallery__item"
+                    onClick={() => setLightboxImage(image)}
+                    aria-label={`Ver imagen ${index + 1}`}
+                  >
+                    <img src={image.secureUrl} alt={`Imagen ${index + 1} de la resena`} loading="lazy" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-        )) : (
+          );
+        }) : (
           <p style={{ fontSize: '0.82rem', color: 'var(--text-3)', padding: '0.5rem 0' }}>Aún no hay reseñas.</p>
         )}
       </div>
@@ -284,6 +435,30 @@ export default function DetailScreen({
           {panelContent}
         </div>
       </div>
+
+      {lightboxImage && (
+        <div
+          className="review-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Imagen de la resena"
+          onClick={() => setLightboxImage(null)}
+        >
+          <button
+            type="button"
+            className="review-lightbox__close"
+            onClick={() => setLightboxImage(null)}
+            aria-label="Cerrar imagen"
+          >
+            <X size={18} strokeWidth={2} />
+          </button>
+          <img
+            src={lightboxImage.secureUrl}
+            alt="Imagen de la resena"
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }
